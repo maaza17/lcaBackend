@@ -13,6 +13,10 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    organization: {
+        type: String,
+        required: true
+    },
     status: {
         type: String,
         enum: ['Suspended', 'Active', 'Deactivated'],
