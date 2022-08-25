@@ -6,6 +6,7 @@
 
     const employeeRoute = require('./routes/employee')
     const adminRoute = require('./routes/admin/admin')
+    const userRoute = require('./routes/user')
 
     app.use(express.urlencoded({ extended: true, limit: 20000000}));
     app.use(express.json());
@@ -33,6 +34,7 @@
 
     app.use('/api/employees', employeeRoute)
     app.use('/api/admin', adminRoute)
+    app.use('/api/users', userRoute)
 
     
     const port = process.env.PORT || 7000;
