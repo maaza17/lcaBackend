@@ -50,4 +50,4 @@ function sendAccountApprovalEmail({name, email}, callback){
     })
 }
 
-module.exports = { sendUserRegistrationEmail, sendAccountVerificationEmail }
+module.exports = {sendUserRegistrationEmail, sendAccountVerificationEmail, sendAccountApprovalEmail}
