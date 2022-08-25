@@ -23,11 +23,15 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    confirmationCode: {
+        type: String,
+        unique: true
+    },
     status: {
         type: String,
-        enum: ['Suspended', 'Active', 'Deactivated'],
+        enum: ['Suspended', 'Active', 'Pending Approval', 'Pending Email Verification'],
         required: false,
-        default: "Active"
+        default: "Pending Email Verification"
     },
     isEmployee: {
         type: {
