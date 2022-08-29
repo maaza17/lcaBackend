@@ -314,11 +314,10 @@ router.post('/verifyuseremail', (req, res) => {
             })
         } else {
             doc.status = 'Pending Approval'
-            doc.confirmationCode = null
 
             doc.save((saveErr, saveDoc) => {
                 if(saveErr){
-                    console.log('save err')
+                    console.log(saveErr)
                     return res.status(200).json({
                         error: true,
                         message: 'An unexpected error occured. Please try again later.'
