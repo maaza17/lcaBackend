@@ -4,6 +4,10 @@
 
     const app = express();
 
+    const homeHeadlineRoute = require('./routes/homeHeadline')
+    const homeBannerRoute = require('./routes/homeBanner')
+    const testimonialsRoute = require('./routes/testimonials')
+    const galleryRoute = require('./routes/gallery')
     const employeeRoute = require('./routes/employee')
     const adminRoute = require('./routes/admin/admin')
     const userRoute = require('./routes/user')
@@ -32,6 +36,11 @@
     .then(() => console.log('Database connected successfully'))
     .catch((err) => console.log(err));
 
+    
+    app.use('/api/homeHeadline', homeHeadlineRoute)
+    app.use('/api/homeBanner', homeBannerRoute)
+    app.use('/api/testimonials', testimonialsRoute)
+    app.use('/api/gallery', galleryRoute)
     app.use('/api/employees', employeeRoute)
     app.use('/api/admin', adminRoute)
     app.use('/api/users', userRoute)

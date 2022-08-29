@@ -53,7 +53,7 @@ router.post('/loginAdmin', (req, res) => {
                                 error: false,
                                 token: adminToken,
                                 userType: "Admin",
-                                admin: admin
+                                admin: {_id: admin._id, name: admin.name, email: admin.email, status: admin.status}
                             });
                         }
                     })
