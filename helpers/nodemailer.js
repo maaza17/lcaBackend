@@ -24,6 +24,19 @@ function sendUserRegistrationEmail({name, email, confirmationCode}, callback){
     })
 }
 
+function sendAdminUserRegistrationEmail({name, username, password}, callback){
+    var mailOptions = {
+        from: '"LCA" <' + process.env.NODEMAILER_USER + '>',
+        to: username,
+        subject: 'MNP LCA Account Credentials',
+        html: '<body><h3>Hello ' + name + '</h3><br /><p> You have been authorised to begin learning on our LCA portal.</p><br /><p> Lets get started. Please find below the credentials to your LCA account :</p><br /><br /><p>Username: '+username+' <p/><br /><p>Password: '+password+' <p/><br /><br /><p>If you have questions, we are here to help. Email us at random@mulphico.com</p><br /><br /><p>Regards,</p><p>Team LCA</p></body>'
+    }
+
+    transport.sendMail(mailOptions, (mailErr, mailInfo) => {
+        return callback(mailErr, mailInfo)
+    })
+}
+
 function sendAccountVerificationEmail({name, email}, callback){
     var mailOptions = {
         from: '"LCA" <' + process.env.NODEMAILER_USER + '>',
@@ -50,4 +63,4 @@ function sendAccountApprovalEmail({name, email}, callback){
     })
 }
 
-module.exports = {sendUserRegistrationEmail, sendAccountVerificationEmail, sendAccountApprovalEmail}
+module.exports = {sendUserRegistrationEmail, sendAccountVerificationEmail, sendAccountApprovalEmail, sendAdminUserRegistrationEmail}

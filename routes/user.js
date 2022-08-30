@@ -5,9 +5,12 @@ const jwt = require("jsonwebtoken")
 const bcrypt = require('bcryptjs')
 const verifyToken = require('../helpers/verifyToken')
 const {validateLoginInput, validateRegisterInput} = require('../validation/userAuthValidation')
-const { sendUserRegistrationEmail, sendAccountVerificationEmail, sendAccountApprovalEmail }  = require('../helpers/nodemailer')
+const adminAddUserValidation = require('../validation/adminAddUserValidation')
+const { sendUserRegistrationEmail, sendAccountVerificationEmail, sendAccountApprovalEmail, sendAdminUserRegistrationEmail }  = require('../helpers/nodemailer')
 const getConfirmationCode = require('../helpers/getConfirmationCode')
+const generateUserPassword = require('../helpers/generateUserPassword')
 const userModel = require('../models/User')
+const employeeModel = require('../models/Employee')
 
 router.post('/registeruser', (req, res) => {
     
@@ -342,6 +345,215 @@ router.post('/verifyuseremail', (req, res) => {
             })
         }
     })
+})
+
+router.post('/addUser_Admin', (req, res) => {
+
+    if(!req.body.token){
+        return res.status(200).json({
+            error: true,
+            message: 'Access denied. Admin token not provided.'
+        })
+    }
+
+    verifyToken(req.body.token, (item) => {
+        const isAdmin = item.isAdmin;
+        const id = item.id;
+        const name = item.name;
+        if (!isAdmin) {
+            return res.status(200).json({
+                error: true,
+                message: 'Access denied. Limited for admin(s).'
+            })
+        } else {
+            // let {empid, empname, empdesignation, empgrade, empdivision,
+            // emplinemanagerid, emplinemanagername, empemail} = req.body
+
+            const { errors, isValid } = adminAddUserValidation(req.body)
+    
+            if(!isValid){
+                return res.status(200).json({
+                    error: true,
+                    message: 'Check error messages below.',
+                    error_message: errors
+                })
+            } else {
+                let empid = req.body.empid?req.body.empid:''
+                let empname = req.body.empname?req.body.empname:''
+                let empdesignation = req.body.empdesignation?req.body.empdesignation:''
+                let empgrade = req.body.empgrade?req.body.empgrade:''
+                let empdivision = req.body.empdivision?req.body.empdivision:''
+                let emplinemanagerid = req.body.emplinemanagerid?req.body.emplinemanagerid:''
+                let emplinemanagername = req.body.emplinemanagername?req.body.emplinemanagername:''
+                let empemail = req.body.empemail?req.body.empemail:''
+
+                let newEmp = new employeeModel({
+                    empid: empid,
+                    empname: empname,
+                    empdesignation: empdesignation,
+                    empgrade: empgrade,
+                    empdivision: empdivision,
+                    emplinemanagerid: emplinemanagerid,
+                    emplinemanagername: emplinemanagername
+                })
+
+                newEmp.save((empSaveErr, empSaveDoc) => {
+                    if(empSaveErr && empSaveErr.code == 11000){
+                        employeeModel.findOne({empid: empid}, (findOneErr, findOneDoc) => {
+                            if(findOneErr || !findOneDoc){
+                                return res.status(200).json({
+                                    error: true,
+                                    message: 'An unexpected error occured. Please try again later.'
+                                })
+                            } else {
+                                let userPass = generateUserPassword()
+                                let newUser = new userModel({
+                                    name: empname,
+                                    email: empemail,
+                                    password: userPass,
+                                    occupation: empdesignation,
+                                    organization: 'Muller & Phipps',
+                                    confirmationCode: getConfirmationCode(),
+                                    status: 'Active',
+                                    isEmployee: {isTrue: true, employeeID: findOneDoc._id}
+                                })
+
+                                // 
+                                bcrypt.genSalt(10, (saltErr, salt) => {
+                                    if(saltErr){
+                                        return res.status(200).json({
+                                            error: true,
+                                            message: "An unexpected error occured. Please try again later"
+                                        })
+                                    } else {
+                                        bcrypt.hash(newUser.password, salt, (hashErr, hash) => {
+                                            if(hashErr){
+                                                return res.status(200).json({
+                                                    error: true,
+                                                    message: "An unexpected error occured. Please try again later"
+                                                })
+                                            } else {
+                                                newUser.password = hash
+                                                newUser.save((saveErr, saveDoc) => {
+                                                    if(saveErr && saveErr.code == 11000){
+                                                        // console.log(saveErr)
+                                                        return res.status(200).json({
+                                                            error: true,
+                                                            message: "An account with this email already exists."
+                                                        })
+                                                    } else if(saveErr){
+                                                        return res.status(200).json({
+                                                            error: true,
+                                                            message: "An unexpected error occured. Please try again later."
+                                                        })
+                                                    } else {                    
+                                                        sendAdminUserRegistrationEmail({name: saveDoc.name, username: saveDoc.email, password: userPass}, (mailErr, mailInfo) => {
+                                                            if(mailErr){
+                                                                return res.status(200).json({
+                                                                    error: true,
+                                                                    message: 'An unexpected error occured. Please try again later.',
+                                                                    error_message: mailErr
+                                                                })
+                                                            } else {
+                                                                return res.status(200).json({
+                                                                    error: false,
+                                                                    message: 'Employee registered as user successfully.',
+                                                                    data: saveDoc
+                                                                })
+                                                            }
+                                                        })
+                                                    }
+                                                })
+                                            }
+                                        })
+                                    }
+                                })
+                                // 
+
+                            }
+                        })
+                    } else if(empSaveErr){
+                        console.log(empSaveErr)
+                        return res.status(200).json({
+                            error: true,
+                            message: 'An unexpected error occured. Please try again later.'
+                        })
+                    } else if(!empSaveDoc){
+                        return res.status(200).json({
+                            error: true,
+                            message: 'An unexpected error occured. Please try again later.'
+                        })
+                    } else {
+                        let userPass = generateUserPassword()
+                        let newUser = new userModel({
+                            name: empname,
+                            email: empemail,
+                            password: userPass,
+                            occupation: empdesignation,
+                            organization: 'Muller & Phipps',
+                            confirmationCode: getConfirmationCode(),
+                            status: 'Active',
+                            isEmployee: {isTrue: true, employeeID: empSaveDoc._id}
+                        })
+
+                        // 
+                        bcrypt.genSalt(10, (saltErr, salt) => {
+                            if(saltErr){
+                                return res.status(200).json({
+                                    error: true,
+                                    message: "An unexpected error occured. Please try again later"
+                                })
+                            } else {
+                                bcrypt.hash(newUser.password, salt, (hashErr, hash) => {
+                                    if(hashErr){
+                                        return res.status(200).json({
+                                            error: true,
+                                            message: "An unexpected error occured. Please try again later"
+                                        })
+                                    } else {
+                                        newUser.password = hash
+                                        newUser.save((saveErr, saveDoc) => {
+                                            if(saveErr && saveErr.code == 11000){
+                                                // console.log(saveErr)
+                                                return res.status(200).json({
+                                                    error: true,
+                                                    message: "An account with this email already exists."
+                                                })
+                                            } else if(saveErr){
+                                                return res.status(200).json({
+                                                    error: true,
+                                                    message: "An unexpected error occured. Please try again later."
+                                                })
+                                            } else {                    
+                                                sendAdminUserRegistrationEmail({name: saveDoc.name, username: saveDoc.email, password: userPass}, (mailErr, mailInfo) => {
+                                                    if(mailErr){
+                                                        return res.status(200).json({
+                                                            error: true,
+                                                            message: 'An unexpected error occured. Please try again later.',
+                                                            error_message: mailErr
+                                                        })
+                                                    } else {
+                                                        return res.status(200).json({
+                                                            error: false,
+                                                            message: 'Employee registered as user successfully.',
+                                                            data: saveDoc
+                                                        })
+                                                    }
+                                                })
+                                            }
+                                        })
+                                    }
+                                })
+                            }
+                        })
+                        //
+                    }
+                })
+
+            }
+        }
+    })
+
 })
 
 module.exports = router

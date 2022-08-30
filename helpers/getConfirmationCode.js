@@ -1,4 +1,4 @@
-// function to generate unique confirmation code for vendor registeration
+// function to generate unique confirmation code for user registeration
 function getConfirmationCode() {
     const characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
     let token = '';
