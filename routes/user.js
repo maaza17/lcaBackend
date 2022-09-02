@@ -171,7 +171,7 @@ router.post('/loginuser', (req, res) => {
     }
 })
 
-router.post('/approveusers', (req, res) => {
+router.post('/approveuser', (req, res) => {
 
     if(!req.body.token){
         return res.status(200).json({
@@ -190,19 +190,34 @@ router.post('/approveusers', (req, res) => {
                 message: 'Access denied. Limited for admin(s).'
             })
         } else {
-            let userIDs = req.body.userIDs
+            let userID = req.body.userID
             
-            userModel.updateMany({_id: {$in: userIDs}, status: 'Pending Approval'}, {status: 'Active'}, (err, updatedUsers) => {
+            userModel.findOneAndUpdate({_id: userID, status: 'Pending Approval'}, {status: 'Active'}, {new: true}, (err, updatedUser) => {
                 if(err){
                     return res.status(200).json({
                         error: true,
                         message: 'An unexpected error occured. Please try again later.'
                     })
-                } else {
+                } else if(!updatedUser){
                     return res.status(200).json({
-                        error: false,
-                        message: 'Users(s) approved succesfully.',
-                        data: updatedUsers
+                        error: true,
+                        message: 'User not found/already approved.'
+                    })
+                }else {
+                    sendAccountApprovalEmail({name: updatedUser.name, email: updatedUser.email}, (mailErr, mailInfo) => {
+                        if(mailErr){
+                            return res.status(200).json({
+                                error: true,
+                                message: 'An unexpected error occured. Please try again later.',
+                                error_message: mailErr
+                            })
+                        } else {
+                            return res.status(200).json({
+                                error: false,
+                                message: 'User approved succesfully.',
+                                data: updatedUser
+                            })
+                        }
                     })
                 }
             })
