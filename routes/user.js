@@ -311,7 +311,6 @@ router.post('/reinstateusers', (req, res) => {
 })
 
 
-// change from update many to findOne and then manual update to consequently send email
 router.post('/verifyuseremail', (req, res) => {
 
     if(!req.body.confirmationCode || req.body.confirmationCode.length <= 0){
@@ -387,9 +386,6 @@ router.post('/addUser_Admin', (req, res) => {
                 message: 'Access denied. Limited for admin(s).'
             })
         } else {
-            // let {empid, empname, empdesignation, empgrade, empdivision,
-            // emplinemanagerid, emplinemanagername, empemail} = req.body
-
             const { errors, isValid } = adminAddUserValidation(req.body)
     
             if(!isValid){
