@@ -159,7 +159,13 @@ router.post('/loginuser', (req, res) => {
                                 return res.status(200).json({
                                     error: false,
                                     token: userToken,
-                                    userType: 'User'
+                                    message: 'Login successful.',
+                                    user: {
+                                        _id: user._id,
+                                        name: user.name,
+                                        email: user.email,
+                                        isEmployee: user.isEmployee
+                                    }
                                 })
                             }
                         })
