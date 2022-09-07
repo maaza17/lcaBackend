@@ -9,13 +9,18 @@ const courseSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    courseThumbnail: {
+        type: String,
+        required: true
+    },
     courseType: {
         type: String,
         required: true
     },
     prerequisites: {
         type: [String],
-        required: true
+        required: true,
+        default: []
     },
     courseAbstract: {
         type: String,
@@ -46,16 +51,12 @@ const courseSchema = new mongoose.Schema({
             countLessons: Number,
             watchTime: String
         },
-        required: true
-    },
-    courseReviews: {
-        type: [{
-            user_name: String,
-            rating: Number,
-            reviewText: String
-        }],
         required: true,
-        default: []
+        default: {
+            countSections: 0,
+            countLessons: 0,
+            watchTime: 'Not Available'
+        }
     },
     availability: {
         type: {
@@ -69,6 +70,17 @@ const courseSchema = new mongoose.Schema({
             forExternals: true,
             employeeList: []
         }
+    },
+    status:{
+        type: String,
+        enum: ['Listed', 'Hidden'],
+        required: true,
+        default: 'Hidden'
+    },
+    dateAdded: {
+        type: Date,
+        required: true,
+        default: Date.now()
     }
 })
 

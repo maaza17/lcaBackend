@@ -42,17 +42,10 @@ const emrollmentSchema = new mongoose.Schema({
         }],
         required: true
     },
-    qa_forum: {
-        type:[{
-            queryAuthor: String,
-            forumQuery: String,
-            queryReplies:[{
-                replyAuthor: String,
-                replyText: String,
-                dateAdded: Date
-            }],
-            dateAdded: Date
-        }]
+    registrationDate: {
+        type: Date,
+        required: true,
+        default: Date.now()
     }
 })
 
