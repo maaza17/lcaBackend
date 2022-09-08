@@ -3,7 +3,7 @@ const mongoose = require('mongoose')
 const adminModel = require('../models/admin/Admin')
 const jwt = require("jsonwebtoken")
 const bcrypt = require('bcryptjs')
-const verifyToken = require('../helpers/verifyToken')
+const verifyAdminToken = require('../helpers/verifyAdminToken')
 const {validateLoginInput, validateRegisterInput} = require('../validation/userAuthValidation')
 const adminAddUserValidation = require('../validation/adminAddUserValidation')
 const { sendUserRegistrationEmail, sendAccountVerificationEmail, sendAccountApprovalEmail, sendAdminUserRegistrationEmail }  = require('../helpers/nodemailer')
@@ -187,7 +187,7 @@ router.post('/approveuser', (req, res) => {
         })
     }
 
-    verifyToken(req.body.token, (item) => {
+    verifyAdminToken(req.body.token, (item) => {
         const isAdmin = item.isAdmin;
         const id = item.id;
         const name = item.name;
@@ -241,7 +241,7 @@ router.post('/suspendusers', (req, res) => {
         })
     }
 
-    verifyToken(req.body.token, (item) => {
+    verifyAdminToken(req.body.token, (item) => {
         const isAdmin = item.isAdmin;
         const id = item.id;
         const name = item.name;
@@ -281,7 +281,7 @@ router.post('/reinstateusers', (req, res) => {
         })
     }
 
-    verifyToken(req.body.token, (item) => {
+    verifyAdminToken(req.body.token, (item) => {
         const isAdmin = item.isAdmin;
         const id = item.id;
         const name = item.name;
@@ -377,7 +377,7 @@ router.post('/addUser_Admin', (req, res) => {
         })
     }
 
-    verifyToken(req.body.token, (item) => {
+    verifyAdminToken(req.body.token, (item) => {
         const isAdmin = item.isAdmin;
         const id = item.id;
         const name = item.name;

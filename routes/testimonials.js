@@ -3,7 +3,7 @@ const mongoose = require('mongoose')
 const jwt = require("jsonwebtoken")
 const testimonialModel = require('../models/Testimonials')
 const adminModel = require('../models/admin/Admin')
-const verifyToken = require('../helpers/verifyToken')
+const verifyAdminToken = require('../helpers/verifyAdminToken')
 
 router.get('/getActiveTestimonials', (req, res) => {
     testimonialModel.find({isDeleted: false}, (err, docs) => {
@@ -58,7 +58,7 @@ router.post('/editTestimonial', (req, res) => {
         })
     }
 
-    verifyToken(req.body.token, (item) => {
+    verifyAdminToken(req.body.token, (item) => {
         const isAdmin = item.isAdmin;
         const id = item.id;
         const name = item.name;
@@ -98,6 +98,106 @@ router.post('/editTestimonial', (req, res) => {
     })
 })
 
+router.post('/hideTestimonial', (req, res) => {
+
+    if(!req.body.token){
+        return res.status(200).json({
+            error: true,
+            message: 'Access denied. Admin token not provided.'
+        })
+    }
+
+    verifyAdminToken(req.body.token, (item) => {
+        const isAdmin = item.isAdmin;
+        const id = item.id;
+        const name = item.name;
+        if (!isAdmin) {
+            return res.status(200).json({
+                error: true,
+                message: 'Access denied. Limited for admin(s).'
+            })
+        } else {
+            
+            if(!req.body.testimonialID){
+                return res.status(200).json({
+                    error: true,
+                    message: "Testimonial id is required."
+                })
+            }
+            let testimonialID = req.body.testimonialID
+            testimonialModel.findOneAndUpdate({_id: testimonialID, isDeleted: false}, {isDeleted: true}, {new: true}, (err, doc) => {
+                if(err){
+                    return res.status(200).json({
+                        error: true,
+                        message: 'An unexpected error occured. Please try again later.'
+                    })
+                }else if(!doc){
+                    return res.status(200).json({
+                        error: true,
+                        message: 'Testimonial not found or is already hidded.'
+                    })
+                } else {
+                    return res.status(200).json({
+                        error: false,
+                        message: 'Testimonial hidden successfully.',
+                        data: doc
+                    })
+                }
+            })
+        }
+    })
+})
+
+router.post('/listTestimonial', (req, res) => {
+
+    if(!req.body.token){
+        return res.status(200).json({
+            error: true,
+            message: 'Access denied. Admin token not provided.'
+        })
+    }
+
+    verifyAdminToken(req.body.token, (item) => {
+        const isAdmin = item.isAdmin;
+        const id = item.id;
+        const name = item.name;
+        if (!isAdmin) {
+            return res.status(200).json({
+                error: true,
+                message: 'Access denied. Limited for admin(s).'
+            })
+        } else {
+            
+            if(!req.body.testimonialID){
+                return res.status(200).json({
+                    error: true,
+                    message: "Testimonial id is required."
+                })
+            }
+            let testimonialID = req.body.testimonialID
+            testimonialModel.findOneAndUpdate({_id: testimonialID, isDeleted: true}, {isDeleted: false}, {new: true}, (err, doc) => {
+                if(err){
+                    return res.status(200).json({
+                        error: true,
+                        message: 'An unexpected error occured. Please try again later.'
+                    })
+                }else if(!doc){
+                    return res.status(200).json({
+                        error: true,
+                        message: 'Testimonial not found or is already listed.'
+                    })
+                } else {
+                    return res.status(200).json({
+                        error: false,
+                        message: 'Testimonial listed successfully.',
+                        data: doc
+                    })
+                }
+            })
+        }
+    })
+})
+
 router.post('/addTestimonial', (req, res) => {
 
     if(!req.body.token){
@@ -107,7 +207,7 @@ router.post('/addTestimonial', (req, res) => {
         })
     }
 
-    verifyToken(req.body.token, (item) => {
+    verifyAdminToken(req.body.token, (item) => {
         const isAdmin = item.isAdmin;
         const id = item.id;
         const name = item.name;

@@ -46,8 +46,17 @@ const emrollmentSchema = new mongoose.Schema({
         type: Date,
         required: true,
         default: Date.now()
+    },
+    completed: {
+        type: Boolean,
+        required: true,
+        default: false
+    },
+    completedDate: {
+        type: Date,
+        default: null
     }
 })
 
-enrollmentModel = new mongoose.model('course', emrollmentSchema)
+enrollmentModel = new mongoose.model('enrollment', emrollmentSchema)
 module.exports = enrollmentModel

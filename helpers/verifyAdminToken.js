@@ -1,6 +1,6 @@
 const jwt = require("jsonwebtoken")
 
-function verifyToken(token, callback) {
+function verifyAdminToken(token, callback) {
     jwt.verify(token, process.env.ENCRYPTION_SECRET, (err, decoded) => {
         if (err) {
             // console.log(err)
@@ -21,4 +21,4 @@ function verifyToken(token, callback) {
     })
 }
 
-module.exports = verifyToken
+module.exports = verifyAdminToken

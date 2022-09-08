@@ -3,7 +3,7 @@ const mongoose = require('mongoose')
 const jwt = require("jsonwebtoken")
 const galleryModel = require('../models/Gallery')
 const adminModel = require('../models/admin/Admin')
-const verifyToken = require('../helpers/verifyToken')
+const verifyAdminToken = require('../helpers/verifyAdminToken')
 
 router.get('/getRecentGalleryMedia', (req, res) => {
     galleryModel.find({mediaType: 'gallery_image', isDeleted: false}, (err, docs) => {
@@ -84,7 +84,7 @@ router.post('/uploadGalleryMedia', (req, res) => {
         })
     }
 
-    verifyToken(req.body.token, (item) => {
+    verifyAdminToken(req.body.token, (item) => {
         const isAdmin = item.isAdmin;
         const id = item.id;
         const name = item.name;
@@ -133,7 +133,7 @@ router.post('/deleteGalleryMedia', (req, res) => {
         })
     }
 
-    verifyToken(req.body.token, (item) => {
+    verifyAdminToken(req.body.token, (item) => {
         const isAdmin = item.isAdmin;
         const id = item.id;
         const name = item.name;

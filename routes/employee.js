@@ -2,7 +2,7 @@ const router = require('express').Router()
 const mongoose = require('mongoose')
 const jwt = require("jsonwebtoken")
 const employeeModel = require('../models/Employee')
-const verifyToken = require('../helpers/verifyToken')
+const verifyAdminToken = require('../helpers/verifyAdminToken')
 
 
 router.post('/isEmployee', (req, res) => {
@@ -33,7 +33,7 @@ router.post('/isEmployee', (req, res) => {
 
 router.post('/getEmployeeDetails', (req, res) => {
 
-    verifyToken(req.body.token, (item) => {
+    verifyAdminToken(req.body.token, (item) => {
         const isAdmin = item.isAdmin;
         const id = item.id;
         const name = item.name;
@@ -70,7 +70,7 @@ router.post('/getEmployeeDetails', (req, res) => {
 
 router.post('/bulkRewriteEmployees', (req, res) => {
     console.log(req.body.token)
-    verifyToken(req.body.token, (item) => {
+    verifyAdminToken(req.body.token, (item) => {
         const isAdmin = item.isAdmin;
         const id = item.id;
         const name = item.name;
@@ -114,7 +114,7 @@ router.post('/bulkRewriteEmployees', (req, res) => {
 
 router.post('/getUnderlings', (req, res) => {
 
-    verifyToken(req.body.token, (item) => {
+    verifyAdminToken(req.body.token, (item) => {
         const isAdmin = item.isAdmin;
         const id = item.id;
         const name = item.name;

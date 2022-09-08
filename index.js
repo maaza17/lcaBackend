@@ -12,6 +12,7 @@
     const adminRoute = require('./routes/admin/admin')
     const userRoute = require('./routes/user')
     const courseRoute = require('./routes/course')
+    const enrollmentRoute = require('./routes/enrollment')
 
     app.use(express.urlencoded({ extended: true, limit: 20000000}));
     app.use(express.json());
@@ -46,6 +47,7 @@
     app.use('/api/admin', adminRoute)
     app.use('/api/users', userRoute)
     app.use('/api/courses', courseRoute)
+    app.use('/api/enrollment', enrollmentRoute)
 
     
     const port = process.env.PORT || 7000;

@@ -3,7 +3,7 @@ const mongoose = require('mongoose')
 const jwt = require("jsonwebtoken")
 const homeHeadlineModel = require('../models/HomeHeadline')
 const adminModel = require('../models/admin/Admin')
-const verifyToken = require('../helpers/verifyToken')
+const verifyAdminToken = require('../helpers/verifyAdminToken')
 
 router.get('/getHomeHeadline', (req, res) => {
     homeHeadlineModel.findOne({}, (err, doc) => {
@@ -36,7 +36,7 @@ router.post('/changeHeadline', (req, res) => {
         })
     }
 
-    verifyToken(req.body.token, (item) => {
+    verifyAdminToken(req.body.token, (item) => {
         const isAdmin = item.isAdmin;
         const id = item.id;
         const name = item.name;

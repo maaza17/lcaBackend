@@ -2,7 +2,9 @@ const router = require('express').Router()
 const mongoose = require('mongoose')
 const jwt = require("jsonwebtoken")
 const courseModel = require('../models/Course')
-const verifyToken = require('../helpers/verifyToken')
+const enrollmentModel = require('../models/Enrollement')
+const verifyAdminToken = require('../helpers/verifyAdminToken')
+const verifyUserToken = require('../helpers/verifyUserToken')
 
 router.get('/getListedCourses', (req, res) => {
 
@@ -36,7 +38,7 @@ router.post('/getHiddenCourses', (req, res) => {
         })
     }
 
-    verifyToken(req.body.token, (item) => {
+    verifyAdminToken(req.body.token, (item) => {
         const isAdmin = item.isAdmin;
         const id = item.id;
         const name = item.name;
@@ -78,7 +80,7 @@ router.post('/hideListedCourse', (req, res) => {
         })
     }
 
-    verifyToken(req.body.token, (item) => {
+    verifyAdminToken(req.body.token, (item) => {
         const isAdmin = item.isAdmin;
         const id = item.id;
         const name = item.name;
@@ -122,7 +124,7 @@ router.post('/listHiddenCourse', (req, res) => {
         })
     }
 
-    verifyToken(req.body.token, (item) => {
+    verifyAdminToken(req.body.token, (item) => {
         const isAdmin = item.isAdmin;
         const id = item.id;
         const name = item.name;
@@ -166,7 +168,7 @@ router.post('/addNewCourse', (req, res) => {
         })
     }
 
-    verifyToken(req.body.token, (item) => {
+    verifyAdminToken(req.body.token, (item) => {
         const isAdmin = item.isAdmin;
         const id = item.id;
         const name = item.name;
@@ -199,7 +201,7 @@ router.post('/addNewCourse', (req, res) => {
             if(courseContent.length > 0){
                 courseContent.forEach((section) => {
                     countSections = countSections + 1
-                    section.forEach((lesson) => {
+                    section.sectionLessons.forEach((lesson) => {
                         countLessons = countLessons + 1
                     })
                 })
@@ -235,6 +237,75 @@ router.post('/addNewCourse', (req, res) => {
         }
     })
 
+})
+
+router.post('/checkEligibility', (req, res) => {
+    if(!req.body.token){
+        return res.status(200).json({
+            error: true,
+            message: 'User token is required to proceed.'
+        })
+    }
+
+    verifyUserToken(req.body.token, (item) => {
+        if((!item) || (!item.isValid)){
+            return res.status(200).json({
+                error: true,
+                message: 'User session expired. Please log in again to proceed.'
+            })
+        } else {
+            let courseID = req.body.courseID?req.body.courseID:null
+
+            enrollmentModel.findOne({courseId: courseID, userId: item.user_id}, (findOneErr, findOneDoc) => {
+                if(!findOneDoc){
+                    courseModel.findOne({_id: courseID, status: 'Listed'}, (courseErr, course) => {
+                        if(courseErr){
+                            return res.status(200).json({
+                                error: true,
+                                message: 'An unexpected error occured. Please try again later.'
+                            })
+                        } else if(!course){
+                            return res.status(200).json({
+                                error: true,
+                                message: 'Invalid course.'
+                            })
+                        } else {
+                            if(course.prerequisites.length > 0){
+                                return res.status(200).json({
+                                    error: false,
+                                    message: 'Click to enroll.'
+                                })
+                            } else {
+                                enrollmentModel.find({_id: {$in: course.prerequisites}, userId: item.user_id, completed: true}, (prereqErr, prereqs) => {
+                                    if(prereqErr){
+                                        return res.status(200).json({
+                                            error: true,
+                                            message: 'An unexpected error occured. Please try again later.'
+                                        })
+                                    } else if(prereqs.length < course.prerequisites){
+                                        return res.status(200).json({
+                                            error: true,
+                                            message: 'Please complete course pre-requisites to enroll.'
+                                        })
+                                    } else {
+                                        return res.status(200).json({
+                                            error: false,
+                                            message: 'Click to enroll.'
+                                        })
+                                    }
+                                })
+                            }
+                        }
+                    })
+                } else {
+                    return res.status(200).json({
+                        error: true,
+                        message: 'Already enrolled.'
+                    })
+                }
+            })                       
+        }
+    })
 })
 
 module.exports = router
