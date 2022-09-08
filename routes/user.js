@@ -160,6 +160,7 @@ router.post('/loginuser', (req, res) => {
                                     error: false,
                                     token: userToken,
                                     message: 'Login successful.',
+                                    userType: 'User',
                                     user: {
                                         _id: user._id,
                                         name: user.name,

@@ -13,12 +13,6 @@ const AdminSchema = new mongoose.Schema({
     password: {
         type: String,
         required: true
-    },
-    status: {
-        type: String,
-        enum: ['Suspended', 'Active', 'Deactivated'],
-        required: false,
-        default: "Active"
     }
 })
 
