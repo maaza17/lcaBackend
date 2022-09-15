@@ -574,4 +574,47 @@ router.post('/addUser_Admin', (req, res) => {
 
 })
 
+router.post('/getAllUsers', (req, res) => {
+
+    if(!req.body.token){
+        return res.status(200).json({
+            error: true,
+            message: 'Access denied. Admin token not provided.'
+        })
+    }
+
+    verifyAdminToken(req.body.token, (item) => {
+        const isAdmin = item.isAdmin;
+        const id = item.id;
+        const name = item.name;
+        if (!isAdmin) {
+            return res.status(200).json({
+                error: true,
+                message: 'Access denied. Limited for admin(s).'
+            })
+        } else {
+            userModel.find({}, {password: false, confirmationCode: false}, (err, docs) => {
+                if(err){
+                    return res.status(200).json({
+                        error: true,
+                        message: 'An unexpected error occured. Please try again later.'
+                    })
+                } else if(docs.length <= 0){
+                    return res.status(200).json({
+                        error: false,
+                        message: 'No users found.'
+                    })
+                } else {
+                    return res.status(200).json({
+                        error: false,
+                        message: ''+ docs.length + ' total users found.',
+                        data: docs
+                    })
+                }
+            })
+        }
+    })
+
+})
+
 module.exports = router
