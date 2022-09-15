@@ -1,7 +1,7 @@
 const jwt = require("jsonwebtoken")
 
 function verifyAdminToken(token, callback) {
-    jwt.verify(token, process.env.ENCRYPTION_SECRET, (err, decoded) => {
+    jwt.verify(token, process.env.ENCRYPTION_SECRET_ADMIN, (err, decoded) => {
         if (err) {
             // console.log(err)
             return callback({

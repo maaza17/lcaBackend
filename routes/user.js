@@ -147,7 +147,7 @@ router.post('/loginuser', (req, res) => {
                             isEmployee: user.isEmployee
                         }
 
-                        jwt.sign(payload, process.env.ENCRYPTION_SECRET, {expiresIn: 172800}, (signErr, userToken) => {
+                        jwt.sign(payload, process.env.ENCRYPTION_SECRET_USER, {expiresIn: 172800}, (signErr, userToken) => {
                             if(signErr){
                                 console.log('user token sign error')
                                 return res.status(200).json({

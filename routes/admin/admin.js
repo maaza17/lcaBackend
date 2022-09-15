@@ -39,7 +39,7 @@ router.post('/loginAdmin', (req, res) => {
                     }
 
                     // sign Token 
-                    jwt.sign(payload, process.env.ENCRYPTION_SECRET, { expiresIn: 86400 }, (signErr, adminToken) => {
+                    jwt.sign(payload, process.env.ENCRYPTION_SECRET_ADMIN, { expiresIn: 86400 }, (signErr, adminToken) => {
                         if (signErr) {
                             console.log('admin token sign error')
                             console.log(signErr)

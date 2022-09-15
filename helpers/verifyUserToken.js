@@ -1,7 +1,7 @@
 const jwt = require("jsonwebtoken")
 
 function verifyUserToken(token, callback) {
-    jwt.verify(token, process.env.ENCRYPTION_SECRET, (err, decoded) => {
+    jwt.verify(token, process.env.ENCRYPTION_SECRET_USER, (err, decoded) => {
         if (err) {
             // console.log(err)
             return callback({
