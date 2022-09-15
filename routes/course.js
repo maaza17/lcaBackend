@@ -12,7 +12,7 @@ router.get('/getListedCourses', (req, res) => {
         if(err){
             return res.status(200).json({
                 error: true,
-                message: 'An unexpected error occured. Please try again later.'
+                message: 'An unexpected error occurred. Please try again later.'
             })
         } else if(docs.length <= 0){
             return res.status(200).json({
@@ -52,7 +52,50 @@ router.post('/getHiddenCourses', (req, res) => {
                 if(err){
                     return res.status(200).json({
                         error: true,
-                        message: 'An unexpected error occured. Please try again later.'
+                        message: 'An unexpected error occurred. Please try again later.'
+                    })
+                } else if(docs.length <= 0){
+                    return res.status(200).json({
+                        error: true,
+                        message: 'No hidden course listings found.'
+                    })
+                } else {
+                    return res.status(200).json({
+                        error: false,
+                        message: 'Hidden course(s) found.',
+                        data: docs
+                    })
+                }
+            })
+        }
+    })
+})
+
+
+router.post('/getAllCourses', (req, res) => {
+
+    if(!req.body.token){
+        return res.status(200).json({
+            error: true,
+            message: 'Access denied. Admin token not provided.'
+        })
+    }
+
+    verifyAdminToken(req.body.token, (item) => {
+        const isAdmin = item.isAdmin;
+        const id = item.id;
+        const name = item.name;
+        if (!isAdmin) {
+            return res.status(200).json({
+                error: true,
+                message: 'Access denied. Limited for admin(s).'
+            })
+        } else {
+            courseModel.find({}, {_id: true, courseName: true, courseThumbnail: true, courseAbstract: true, courseInstructor:true, courseType: true, courseStats: true, dateCreated: true, status:true}, (err, docs) => {
+                if(err){
+                    return res.status(200).json({
+                        error: true,
+                        message: 'An unexpected error occurred. Please try again later.'
                     })
                 } else if(docs.length <= 0){
                     return res.status(200).json({
@@ -96,7 +139,7 @@ router.post('/hideListedCourse', (req, res) => {
                 if(err){
                     return res.status(200).json({
                         error: true,
-                        message: 'An unexpected error occured. Please try again later.'
+                        message: 'An unexpected error occurred. Please try again later.'
                     })
                 } else if(!hiddenCourse){
                     return res.status(200).json({
@@ -140,7 +183,7 @@ router.post('/listHiddenCourse', (req, res) => {
                 if(err){
                     return res.status(200).json({
                         error: true,
-                        message: 'An unexpected error occured. Please try again later.'
+                        message: 'An unexpected error occurred. Please try again later.'
                     })
                 } else if(!listedCourse){
                     return res.status(200).json({
@@ -224,7 +267,7 @@ router.post('/addNewCourse', (req, res) => {
                 if(err){
                     return res.status(200).json({
                         error: true,
-                        message: 'An unexpected error occured. Please try again later.'
+                        message: 'An unexpected error occurred. Please try again later.'
                     })
                 } else {
                     return res.status(200).json({
@@ -262,7 +305,7 @@ router.post('/checkEligibility', (req, res) => {
                         if(courseErr){
                             return res.status(200).json({
                                 error: true,
-                                message: 'An unexpected error occured. Please try again later.'
+                                message: 'An unexpected error occurred. Please try again later.'
                             })
                         } else if(!course){
                             return res.status(200).json({
@@ -280,7 +323,7 @@ router.post('/checkEligibility', (req, res) => {
                                     if(prereqErr){
                                         return res.status(200).json({
                                             error: true,
-                                            message: 'An unexpected error occured. Please try again later.'
+                                            message: 'An unexpected error occurred. Please try again later.'
                                         })
                                     } else if(prereqs.length < course.prerequisites){
                                         return res.status(200).json({

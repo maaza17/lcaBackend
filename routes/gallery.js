@@ -10,7 +10,7 @@ router.get('/getRecentGalleryMedia', (req, res) => {
         if(err){
             return res.status(200).json({
                 error: true,
-                message: 'An unexpected error occured. Please try again later'
+                message: 'An unexpected error occurred. Please try again later'
             })
         } else if(docs.length > 0) {
             return res.status(200).json({
@@ -21,7 +21,7 @@ router.get('/getRecentGalleryMedia', (req, res) => {
         } else {
             return res.status(200).json({
                 error: true,
-                message: 'An unexpected error occured. Please try again later'
+                message: 'An unexpected error occurred. Please try again later'
             })
         }
     })
@@ -34,7 +34,7 @@ router.get('/getActiveGalleryMedia', (req, res) => {
         if(err){
             return res.status(200).json({
                 error: true,
-                message: 'An unexpected error occured. Please try again later'
+                message: 'An unexpected error occurred. Please try again later'
             })
         } else if(docs.length > 0) {
             return res.status(200).json({
@@ -45,7 +45,7 @@ router.get('/getActiveGalleryMedia', (req, res) => {
         } else {
             return res.status(200).json({
                 error: true,
-                message: 'An unexpected error occured. Please try again later'
+                message: 'An unexpected error occurred. Please try again later'
             })
         }
     })
@@ -57,7 +57,7 @@ router.get('/getAllGalleryMedia', (req, res) => {
         if(err){
             return res.status(200).json({
                 error: true,
-                message: 'An unexpected error occured. Please try again later'
+                message: 'An unexpected error occurred. Please try again later'
             })
         } else if(docs.length > 0) {
             return res.status(200).json({
@@ -68,7 +68,7 @@ router.get('/getAllGalleryMedia', (req, res) => {
         } else {
             return res.status(200).json({
                 error: true,
-                message: 'An unexpected error occured. Please try again later'
+                message: 'An unexpected error occurred. Please try again later'
             })
         }
     })
@@ -116,7 +116,7 @@ router.post('/uploadGalleryMedia', (req, res) => {
             .catch((err) => {
                 return res.status(200).json({
                     error: true,
-                    message: 'An unexpected error ocured. Please try again later.',
+                    message: 'An unexpected error ocurred. Please try again later.',
                     err_message: err.message
                 })
             })
@@ -154,12 +154,12 @@ router.post('/deleteGalleryMedia', (req, res) => {
             galleryModel.updateMany({_id: {$in: mediaIDs}}, {isDeleted: true}, (err, docs) => {
                 if(err){
                     return res.status(200).json({
-                        error: false,
-                        message: 'An unexpected error occured. Please try again later.'
+                        error: true,
+                        message: 'An unexpected error occurred. Please try again later.'
                     })
                 } else if(docs.modifiedCount <= 0){
                     return res.status(200).json({
-                        error: false,
+                        error: true,
                         message: 'No matching records found. No gallery images affected.'
                     })
                 }else {

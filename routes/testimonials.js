@@ -10,7 +10,7 @@ router.get('/getActiveTestimonials', (req, res) => {
         if(err){
             return res.status(200).json({
                 error: true,
-                message: 'An unexpected error occured. Please try again later.'
+                message: 'An unexpected error occurred. Please try again later.'
             })
         } else if(docs .length > 0) {
             return res.status(200).json({
@@ -32,7 +32,7 @@ router.get('/getAllTestimonials', (req, res) => {
         if(err){
             return res.status(200).json({
                 error: true,
-                message: 'An unexpected error occured. Please try again later.'
+                message: 'An unexpected error occurred. Please try again later.'
             })
         } else if(docs .length > 0) {
             return res.status(200).json({
@@ -79,7 +79,7 @@ router.post('/editTestimonial', (req, res) => {
                 if(err){
                     return res.status(200).json({
                         error: true,
-                        message: 'An unexpected error occured. Please try again later.'
+                        message: 'An unexpected error occurred. Please try again later.'
                     })
                 }else if(!doc){
                     return res.status(200).json({
@@ -129,12 +129,12 @@ router.post('/hideTestimonial', (req, res) => {
                 if(err){
                     return res.status(200).json({
                         error: true,
-                        message: 'An unexpected error occured. Please try again later.'
+                        message: 'An unexpected error occurred. Please try again later.'
                     })
                 }else if(!doc){
                     return res.status(200).json({
                         error: true,
-                        message: 'Testimonial not found or is already hidded.'
+                        message: 'Testimonial not found or is already hidden.'
                     })
                 } else {
                     return res.status(200).json({
@@ -179,7 +179,7 @@ router.post('/listTestimonial', (req, res) => {
                 if(err){
                     return res.status(200).json({
                         error: true,
-                        message: 'An unexpected error occured. Please try again later.'
+                        message: 'An unexpected error occurred. Please try again later.'
                     })
                 }else if(!doc){
                     return res.status(200).json({
@@ -223,7 +223,7 @@ router.post('/addTestimonial', (req, res) => {
                 if(err){
                     return res.status(200).json({
                         error: true,
-                        message: 'An unexpected error occured. Please try again later.'
+                        message: 'An unexpected error occurred. Please try again later.'
                     })
                 } else {
                     return res.status(200).json({
