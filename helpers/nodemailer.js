@@ -16,7 +16,7 @@ function sendUserRegistrationEmail({name, email, confirmationCode}, callback){
         from: '"LCA" <' + process.env.NODEMAILER_USER + '>',
         to: email,
         subject: 'MNP LCA Account Verification',
-        html: '<body><h3>Hello ' + name + '</h3><br /><p> Thank you for signing up for LCA.</p><br /><p> Lets get started. Please verify your account by following this link :</p><br /><br /><a href='+process.env.REACT_APP_BACKEND_URL+'/verify?code=' + confirmationCode + '">Verify Account</a><br /><br /><p>If you have questions, we are here to help. Email us at random@mulphico.com</p><br /><br /><p>Regards,</p><p>Team LCA</p></body>'
+        html: '<body><h3>Hello ' + name + '</h3><br /><p> Thank you for signing up for LCA.</p><br /><p> Lets get started. Please verify your account by following this link :</p><br /><br /><a href="'+process.env.REACT_APP_BACKEND_URL+'/verify?code=' + confirmationCode + '">Verify Account</a><br /><br /><p>If you have questions, we are here to help. Email us at random@mulphico.com</p><br /><br /><p>Regards,</p><p>Team LCA</p></body>'
     }
 
     transport.sendMail(mailOptions, (mailErr, mailInfo) => {
