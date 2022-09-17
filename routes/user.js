@@ -4,9 +4,10 @@ const adminModel = require('../models/admin/Admin')
 const jwt = require("jsonwebtoken")
 const bcrypt = require('bcryptjs')
 const verifyAdminToken = require('../helpers/verifyAdminToken')
+const verifyUserToken = require('../helpers/verifyUserToken')
 const {validateLoginInput, validateRegisterInput} = require('../validation/userAuthValidation')
 const adminAddUserValidation = require('../validation/adminAddUserValidation')
-const { sendUserRegistrationEmail, sendAccountVerificationEmail, sendAccountApprovalEmail, sendAdminUserRegistrationEmail }  = require('../helpers/nodemailer')
+const { sendUserRegistrationEmail, sendAccountVerificationEmail, sendAccountApprovalEmail, sendAdminUserRegistrationEmail, sendLoggedInPasswordResetEmail }  = require('../helpers/nodemailer')
 const getConfirmationCode = require('../helpers/getConfirmationCode')
 const generateUserPassword = require('../helpers/generateUserPassword')
 const userModel = require('../models/User')
@@ -615,6 +616,92 @@ router.post('/getAllUsers', (req, res) => {
         }
     })
 
+})
+
+router.post('/resetAdminPasswordLoggedIn', (req, res) => {
+    if(!req.body.token){
+        return res.status(200).json({
+            error: true,
+            message: 'User token is required to proceed.'
+        })
+    }
+
+    verifyUserToken(req.body.token, (item) => {
+        if((!item) || (!item.isValid)){
+            return res.status(200).json({
+                error: true,
+                message: 'User session expired. Please log in again to proceed.'
+            })
+        } else {
+
+
+            if(!req.body.newPass){
+                return res.status(200).json({
+                    error: true,
+                    message: 'New password is required.'
+                })
+            }
+            userModel.findOne({_id: item.user_id}, (err, doc) => {
+                if(err){
+                    return res.status(200).json({
+                        error: true,
+                        message: 'An Unexpected error occured. Please try again later.'
+                    })
+                } else if(!doc){
+                    return res.status(200).json({
+                        error: true,
+                        message: 'Invalid user. Can not reset password.'
+                    })
+                } else {
+                    bcrypt.genSalt(10, (saltErr, salt) => {
+                        if(saltErr){
+                            return res.status(200).json({
+                                error: true,
+                                message: 'Unexpected error during new system-generated password creation. Please try again later.'
+                            })
+                        } else {
+                            bcrypt.hash(req.body.newPass, salt, (hashErr, hash) => {
+                                if(hashErr){
+                                    return res.status(200).json({
+                                        error: true,
+                                        message: 'Unexpected error during new system-generated password creation. Please try again later.'
+                                    })
+                                } else {
+                                    doc.password = hash
+                                    doc.save((saveErr, saveDoc) => {
+                                        if(saveErr){
+                                            return res.status(200).json({
+                                                error: true,
+                                                message: 'An Unexpected error occured. Please try again later.'
+                                            })
+                                        } else {
+                                            // send password reset email here
+                                            sendLoggedInPasswordResetEmail({name: doc.name, email: doc.email}, (mailErr, mailInfo) => {
+                                                if(mailErr){
+                                                    return res.status(200).json({
+                                                        error: true,
+                                                        message: 'An unexpected error occured. Please try again later.',
+                                                        error_message: mailErr
+                                                    })
+                                                } else {
+                                                    return res.status(200).json({
+                                                        error: false,
+                                                        message: 'Password reset successfully.',
+                                                        data: saveDoc
+                                                    })
+                                                }
+                                            })
+                                        }
+                                    })
+                                }
+                            })
+                        }
+                    })
+                }
+            })
+
+        }
+    })
 })
 
 module.exports = router

@@ -63,4 +63,17 @@ function sendAccountApprovalEmail({name, email}, callback){
     })
 }
 
-module.exports = {sendUserRegistrationEmail, sendAccountVerificationEmail, sendAccountApprovalEmail, sendAdminUserRegistrationEmail}
+function sendLoggedInPasswordResetEmail({name, email}, callback){
+    var mailOptions = {
+        from: '"LCA" <' + process.env.NODEMAILER_USER + '>',
+        to: email,
+        subject: 'MNP LCA Password Reset',
+        html: '<body><h3>Hello ' + name + '</h3><br /><p>Your account password was recently reset.</p><br /><p><br />If this action was not performed by you, or you think this is suspisious, please reset your password again by visiting this <a href="www.google.com">link.<a/><br /><br />If you have questions, we are here to help. Email us at random@mulphico.com</p><br /><br /><p>Regards,</p><p>Team LCA</p></body>'
+    }
+
+    transport.sendMail(mailOptions, (mailErr, mailInfo) => {
+        return callback(mailErr, mailInfo)
+    })
+}
+
+module.exports = {sendUserRegistrationEmail, sendAccountVerificationEmail, sendAccountApprovalEmail, sendAdminUserRegistrationEmail, sendLoggedInPasswordResetEmail}

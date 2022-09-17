@@ -1,8 +1,10 @@
 const router = require('express').Router()
 const mongoose = require('mongoose')
 const adminModel = require('../../models/admin/Admin')
+const verifyAdminToken = require('../../helpers/verifyAdminToken')
 const jwt = require("jsonwebtoken")
 const bcrypt = require('bcryptjs')
+const { sendUserRegistrationEmail, sendAccountVerificationEmail, sendAccountApprovalEmail, sendAdminUserRegistrationEmail, sendLoggedInPasswordResetEmail }  = require('../../helpers/nodemailer')
 const { validateAdminLoginInput, validateAdminRegisterInput } = require('../../validation/adminAuthValidation')
 
 router.post('/loginAdmin', (req, res) => {
@@ -119,6 +121,95 @@ router.post('/registerAdmin', (req, res) => {
         })
     })
 
+})
+
+router.post('/resetAdminPasswordLoggedIn', (req, res) => {
+    if(!req.body.token){
+        return res.status(200).json({
+            error: true,
+            message: 'Admin token is required to proceed.'
+        })
+    }
+
+    verifyAdminToken(req.body.token, (item) => {
+        const isAdmin = item.isAdmin;
+        const id = item.id;
+        const name = item.name;
+        if (!isAdmin) {
+            return res.status(200).json({
+                error: true,
+                message: 'Access denied. Limited for admin(s).'
+            })
+        } else {
+
+
+            if(!req.body.newPass){
+                return res.status(200).json({
+                    error: true,
+                    message: 'New password is required.'
+                })
+            }
+            adminModel.findOne({_id: item.id}, (err, doc) => {
+                if(err){
+                    return res.status(200).json({
+                        error: true,
+                        message: 'An Unexpected error occured. Please try again later.'
+                    })
+                } else if(!doc){
+                    return res.status(200).json({
+                        error: true,
+                        message: 'Invalid admin. Can not reset password.'
+                    })
+                } else {
+                    bcrypt.genSalt(10, (saltErr, salt) => {
+                        if(saltErr){
+                            return res.status(200).json({
+                                error: true,
+                                message: 'Unexpected error during new system-generated password creation. Please try again later.'
+                            })
+                        } else {
+                            bcrypt.hash(req.body.newPass, salt, (hashErr, hash) => {
+                                if(hashErr){
+                                    return res.status(200).json({
+                                        error: true,
+                                        message: 'Unexpected error during new system-generated password creation. Please try again later.'
+                                    })
+                                } else {
+                                    doc.password = hash
+                                    doc.save((saveErr, saveDoc) => {
+                                        if(saveErr){
+                                            return res.status(200).json({
+                                                error: true,
+                                                message: 'An Unexpected error occured. Please try again later.'
+                                            })
+                                        } else {
+                                            // send password reset email here
+                                            sendLoggedInPasswordResetEmail({name: doc.name, email: doc.email}, (mailErr, mailInfo) => {
+                                                if(mailErr){
+                                                    return res.status(200).json({
+                                                        error: true,
+                                                        message: 'An unexpected error occured. Please try again later.',
+                                                        error_message: mailErr
+                                                    })
+                                                } else {
+                                                    return res.status(200).json({
+                                                        error: false,
+                                                        message: 'Password reset successfully.',
+                                                        data: saveDoc
+                                                    })
+                                                }
+                                            })
+                                        }
+                                    })
+                                }
+                            })
+                        }
+                    })
+                }
+            })
+
+        }
+    })
 })
 
 
