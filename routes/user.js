@@ -121,6 +121,11 @@ router.post('/loginuser', (req, res) => {
                 } else if(user.status === 'Pending Approval'){
                     return res.status(200).json({
                         error: true,
+                        message: 'Please wait until an admin from the LCA team approves your learning account.'
+                    })
+                } else if(user.status === 'Pending Email Verification'){
+                    return res.status(200).json({
+                        error: true,
                         message: 'The email registered with your learning account has not yet been verified. Please check your inbox to verify your email.'
                     })
                 }

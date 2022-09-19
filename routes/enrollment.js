@@ -94,4 +94,47 @@ router.post('/enrollCourse', (req, res) => {
     })
 })
 
+router.post('/deEnrollCourse', (req, res) => {
+    if(!req.body.token){
+        return res.status(200).json({
+            error: true,
+            message: 'User token is required to proceed.'
+        })
+    }
+
+    verifyUserToken(req.body.token, (item) => {
+        if((!item) || (!item.isValid)){
+            return res.status(200).json({
+                error: true,
+                message: 'User session expired. Please log in again to proceed with de-enrollment.'
+            })
+        } else {
+            if(!req.body.enrollmentID){
+                return res.status(200).json({
+                    error: true,
+                    message: "Course enrollment ID is required. Please try again later."
+                })
+            }
+            enrollmentModel.findOneAndDelete({_id: req.body.enrollmentID}, (err, deleted) => {
+                if(err){
+                    return res.status(200).json({
+                        error: true,
+                        message: 'An unexpected error occured. Please try again later.'
+                    })
+                } else if(!deleted){
+                    return res.status(200).json({
+                        error: true,
+                        message: 'Invalid course enrollment. Can not de-enroll.'
+                    })
+                } else {
+                    return res.status(200).json({
+                        error: false,
+                        message: 'De-enrollment successful.'
+                    })
+                }
+            })
+        }
+    })
+})
+
 module.exports = router
