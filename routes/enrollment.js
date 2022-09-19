@@ -137,4 +137,69 @@ router.post('/deEnrollCourse', (req, res) => {
     })
 })
 
+router.post('/markLessonCompleted', (req, res) => {
+    // console.log(req.body)
+    if(!req.body.token){
+        return res.status(200).json({
+            error: true,
+            message: 'User token is required to proceed.'
+        })
+    }
+
+    verifyUserToken(req.body.token, (item) => {
+        if((!item) || (!item.isValid)){
+            return res.status(200).json({
+                error: true,
+                message: 'User session expired. Please log in again to proceed.'
+            })
+        } else {
+            if(!req.body.enrollmentID || !req.body.sectionID || !req.body.lessonID){
+                return res.status(200).json({
+                    error: true,
+                    message: 'Parameter(s) missing.'
+                })
+            }
+
+            enrollmentModel.findOne({_id: req.body.enrollmentID}, (err, doc) => {
+                if(err){
+                    return res.status(200).json({
+                        error: true,
+                        message: 'An unexpected error occured. Please try again later.'
+                    })
+                } else {
+                    let temp = doc.courseContent
+                    temp = temp.map(section => {
+                        if(section._id == req.body.sectionID){
+                            let temp_lessons = section.sectionLessons
+                            temp_lessons = temp_lessons.map(lesson => {
+                                if(lesson._id == req.body.lessonID){
+                                    return {...lesson, completed: true}
+                                }
+                            })
+                            section.sectionLessons = temp_lessons
+                            return section
+                        }
+                    })
+                    doc.courseContent = temp
+
+                    enrollmentModel.findOneAndUpdate({_id: req.body.enrollmentID}, doc, {new: true}, (newErr, newDoc) => {
+                        if(newErr){
+                            return res.status(200).json({
+                                error: true,
+                                message: 'An unexpected error occured. Please try again later.'
+                            })
+                        } else {
+                            return res.status(200).json({
+                                error: false,
+                                message: 'Updated successfully.',
+                                data: newDoc
+                            })
+                        }
+                    })
+                }
+            })
+        }
+    })
+})
+
 module.exports = router

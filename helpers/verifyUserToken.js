@@ -3,7 +3,7 @@ const jwt = require("jsonwebtoken")
 function verifyUserToken(token, callback) {
     jwt.verify(token, process.env.ENCRYPTION_SECRET_USER, (err, decoded) => {
         if (err) {
-            // console.log(err)
+            // console.log('err block')
             return callback({
                 isValid: false,
                 user_id: null,
@@ -11,6 +11,7 @@ function verifyUserToken(token, callback) {
                 isEmployee: null
             });
         } else if (decoded) {
+            // console.log('decoded block')
             return callback({
                 isValid: true,
                 user_id: decoded.userID,
@@ -18,6 +19,7 @@ function verifyUserToken(token, callback) {
                 isEmployee: decoded.isEmployee
             })
         } else {
+            // console.log('null block')
             return callback({
                 isValid: false,
                 user_id: null,
