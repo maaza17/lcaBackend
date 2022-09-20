@@ -265,6 +265,11 @@ router.post('/suspendusers', (req, res) => {
                         error: true,
                         message: 'An unexpected error occured. Please try again later.'
                     })
+                } else if(updatedUsers.matchedCount <= 0){
+                    return res.status(200).json({
+                        error: true,
+                        message: 'User(s) already suspended and/or invalid users flagged for suspension.'
+                    })
                 } else {
                     return res.status(200).json({
                         error: false,
@@ -304,6 +309,11 @@ router.post('/reinstateusers', (req, res) => {
                     return res.status(200).json({
                         error: true,
                         message: 'An unexpected error occured. Please try again later.'
+                    })
+                } else if(updatedUsers.matchedCount <= 0){
+                    return res.status(200).json({
+                        error: true,
+                        message: 'User(s) already active and/or invalid users flagged for reinstatement.'
                     })
                 } else {
                     return res.status(200).json({
