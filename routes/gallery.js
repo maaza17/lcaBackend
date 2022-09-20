@@ -150,8 +150,7 @@ router.post('/deleteGalleryMedia', (req, res) => {
                     message: 'No media identified for deletion.'
                 })
             }
-            // console.log(mediaIDs)
-            galleryModel.updateMany({_id: {$in: mediaIDs}}, {isDeleted: true}, (err, docs) => {
+            galleryModel.updateMany({_id: {$in: mediaIDs}, isDeleted: false}, {isDeleted: true}, (err, docs) => {
                 if(err){
                     return res.status(200).json({
                         error: true,
@@ -166,6 +165,55 @@ router.post('/deleteGalleryMedia', (req, res) => {
                     return res.status(200).json({
                         error: false,
                         message: 'Soft delete successful',
+                        data: docs
+                    })
+                }
+            })
+        }
+    })
+})
+
+router.post('/listGalleryMedia', (req, res) => {
+
+    if(!req.body.token){
+        return res.status(200).json({
+            error: true,
+            message: 'Access denied. Admin token not provided.'
+        })
+    }
+
+    verifyAdminToken(req.body.token, (item) => {
+        const isAdmin = item.isAdmin;
+        const id = item.id;
+        const name = item.name;
+        if (!isAdmin) {
+            return res.status(200).json({
+                error: true,
+                message: 'Access denied. Limited for admin(s).'
+            })
+        } else {
+            let mediaIDs = req.body.mediaIDs?req.body.mediaIDs:[]
+            if(mediaIDs.length <= 0){
+                return res.status(200).json({
+                    error: true,
+                    message: 'No media marked for undo delete.'
+                })
+            }
+            galleryModel.updateMany({_id: {$in: mediaIDs}, isDeleted: true}, {isDeleted: false}, (err, docs) => {
+                if(err){
+                    return res.status(200).json({
+                        error: true,
+                        message: 'An unexpected error occurred. Please try again later.'
+                    })
+                } else if(docs.modifiedCount <= 0){
+                    return res.status(200).json({
+                        error: true,
+                        message: 'No matching records found. No gallery images affected.'
+                    })
+                }else {
+                    return res.status(200).json({
+                        error: false,
+                        message: 'Undo delete successful',
                         data: docs
                     })
                 }
