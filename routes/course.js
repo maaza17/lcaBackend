@@ -351,4 +351,33 @@ router.post('/checkEligibility', (req, res) => {
     })
 })
 
+router.post('/getCourseDetails', (req, res) => {
+    if(!req.body.courseID){
+        return res.status(200).json({
+            error: true,
+            message:'Course ID is required.'
+        })
+    }
+
+    courseModel.findOne({_id: req.body.courseID}, (err, course) => {
+        if(err){
+            return res.status(200).json({
+                error: true,
+                message: 'An unexpected error occured. Please try again later.'
+            })
+        } else if(!course){
+            return res.status(200).json({
+                error: true,
+                message: 'Course not found.'
+            })
+        } else {
+            return res.status(200).json({
+                error: false,
+                message: 'Course found.',
+                data: course
+            })
+        }
+    })
+})
+
 module.exports = router
