@@ -1,6 +1,13 @@
     const express = require('express')
     const mongoose = require('mongoose')
+    const https = require('https')
+//    const fs = require('fs')
     require("dotenv").config();
+
+//    var options = {
+//        key: fs.readFileSync('./certs/server-key.pem'),
+//        cert: fs.readFileSync('./certs/server-cert.pem'),
+//    };
 
     const app = express();
 
@@ -50,9 +57,12 @@
     app.use('/api/enrollment', enrollmentRoute)
 
     
-    const port = process.env.PORT || 7000;
+    const port = process.env.PORT || 7001;
+
+//    const server = https.createServer(options, app).listen(port, function(){
+//        console.log("Server running on port " + port);
+//    });
 
     app.listen(port,  () => {
         console.log('Server running on port ' + port)
-
     })
