@@ -37,7 +37,7 @@ const courseSchema = new mongoose.Schema({
                 lessionThumbnail: String,
                 lessonQuiz: [{
                     question: String,
-                    answerOptions: [String],
+                    answerOptions: {option1: String, option2: String, option3: String, option4: String},
                     correctAnswer: String
                 }]
             }]
