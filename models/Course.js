@@ -62,7 +62,7 @@ const courseSchema = new mongoose.Schema({
         type: {
             forEmployees: Boolean,
             forExternals: Boolean,
-            employeeList: [String]
+            employeeList: [{employeeID: mongoose.Schema.ObjectId}]
         },
         required: true,
         default: {

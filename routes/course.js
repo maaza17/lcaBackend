@@ -380,4 +380,96 @@ router.post('/getCourseDetails', (req, res) => {
     })
 })
 
+router.post('/getprereqdropdown', (req, res) => {
+    if(!req.body.token){
+        return res.status(200).json({
+            error: true,
+            message: 'Access denied. Admin token not provided.'
+        })
+    }
+
+    verifyAdminToken(req.body.token, (item) => {
+        const isAdmin = item.isAdmin;
+        const id = item.id;
+        const name = item.name;
+        if (!isAdmin) {
+            return res.status(200).json({
+                error: true,
+                message: 'Access denied.'
+            })
+        } else {
+            courseModel.find({}, {_id: true, courseName: true, courseInstructor: true}, (err, docs) => {
+                if(err){
+                    return res.status(200).json({
+                        error: true,
+                        message: 'An unexpected error occurred. Please try again later.'
+                    })
+                } else if(docs.length <= 0){
+                    return res.status(200).json({
+                        error: true,
+                        message: 'No course listings found.'
+                    })
+                } else {
+                    return res.status(200).json({
+                        error: false,
+                        message: 'Course(s) found.',
+                        data: docs
+                    })
+                }
+            })
+        }
+    })
+})
+
+router.post('/checkAvailability', (req, res) => {
+    if(!req.body.token){
+        return res.status(200).json({
+            error: true,
+            message: 'User token is required to proceed.'
+        })
+    }
+
+    verifyUserToken(req.body.token, (item) => {
+        if((!item) || (!item.isValid)){
+            return res.status(200).json({
+                error: true,
+                message: 'User session expired. Please log in again to proceed.'
+            })
+        } else {
+            if(item.isEmployee.isTrue){
+                courseModel.find({"availability.forEmployees": true, "availability.employeeList": {$elemMatch: {employeeID: item.isEmployee.employeeID}}}, {_id: true}, (err, docs) => {
+                    if(err){
+                        console.log(err.message)
+                        return res.status(200).json({
+                            error: true,
+                            message: 'An unexpected error occured. Please try again later.'
+                        })
+                    } else {
+                        return res.status(200).json({
+                            error: false,
+                            message: 'Available courses found.',
+                            data: docs
+                        })
+                    }
+                })
+            } else {
+                courseModel.find({"availability.forExternals": true}, {_id: true}, (err, docs) => {
+                    if(err){
+                        return res.status(200).json({
+                            error: true,
+                            message: 'An unexpected error occured. Please try again later.'
+                        })
+                    } else {
+                        return res.status(200).json({
+                            error: false,
+                            message: 'Available courses found.',
+                            data: docs
+                        })
+                    }
+                })
+            }
+        }
+    })
+})
+
 module.exports = router
