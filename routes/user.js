@@ -633,7 +633,7 @@ router.post('/getAllUsers', (req, res) => {
 
 })
 
-router.post('/resetAdminPasswordLoggedIn', (req, res) => {
+router.post('/resetUserPasswordLoggedIn', (req, res) => {
     if(!req.body.token){
         return res.status(200).json({
             error: true,
@@ -650,6 +650,12 @@ router.post('/resetAdminPasswordLoggedIn', (req, res) => {
         } else {
 
 
+            if(!req.body.oldPass){
+                return res.status(200).json({
+                    error: true,
+                    message: 'Old password is required.'
+                })
+            }
             if(!req.body.newPass){
                 return res.status(200).json({
                     error: true,
@@ -668,41 +674,53 @@ router.post('/resetAdminPasswordLoggedIn', (req, res) => {
                         message: 'Invalid user. Can not reset password.'
                     })
                 } else {
-                    bcrypt.genSalt(10, (saltErr, salt) => {
-                        if(saltErr){
+                    
+                    bcrypt.compare(req.body.oldPass, doc.password).catch((passErr) => {
+                        if(passErr){
                             return res.status(200).json({
                                 error: true,
-                                message: 'Unexpected error during new system-generated password creation. Please try again later.'
+                                message: 'An unexpected error ocurred. Please try again later.'
                             })
-                        } else {
-                            bcrypt.hash(req.body.newPass, salt, (hashErr, hash) => {
-                                if(hashErr){
+                        }
+                    })
+                    .then((isMatch) => {
+                        if(isMatch){
+                            bcrypt.genSalt(10, (saltErr, salt) => {
+                                if(saltErr){
                                     return res.status(200).json({
                                         error: true,
-                                        message: 'Unexpected error during new system-generated password creation. Please try again later.'
+                                        message: 'Unexpected error occured. Please try again later.'
                                     })
                                 } else {
-                                    doc.password = hash
-                                    doc.save((saveErr, saveDoc) => {
-                                        if(saveErr){
+                                    bcrypt.hash(req.body.newPass, salt, (hashErr, hash) => {
+                                        if(hashErr){
                                             return res.status(200).json({
                                                 error: true,
-                                                message: 'An Unexpected error occured. Please try again later.'
+                                                message: 'Unexpected error occured. Please try again later.'
                                             })
                                         } else {
-                                            // send password reset email here
-                                            sendLoggedInPasswordResetEmail({name: doc.name, email: doc.email}, (mailErr, mailInfo) => {
-                                                if(mailErr){
+                                            doc.password = hash
+                                            doc.save((saveErr, saveDoc) => {
+                                                if(saveErr){
                                                     return res.status(200).json({
                                                         error: true,
-                                                        message: 'An unexpected error occured. Please try again later.',
-                                                        error_message: mailErr
+                                                        message: 'An Unexpected error occured. Please try again later.'
                                                     })
                                                 } else {
-                                                    return res.status(200).json({
-                                                        error: false,
-                                                        message: 'Password reset successfully.',
-                                                        data: saveDoc
+                                                    // send password reset email here
+                                                    sendLoggedInPasswordResetEmail({name: doc.name, email: doc.email}, (mailErr, mailInfo) => {
+                                                        if(mailErr){
+                                                            return res.status(200).json({
+                                                                error: true,
+                                                                message: 'An unexpected error occured. Please try again later.',
+                                                                error_message: mailErr
+                                                            })
+                                                        } else {
+                                                            return res.status(200).json({
+                                                                error: false,
+                                                                message: 'Password reset successfully.'
+                                                            })
+                                                        }
                                                     })
                                                 }
                                             })
@@ -710,8 +728,14 @@ router.post('/resetAdminPasswordLoggedIn', (req, res) => {
                                     })
                                 }
                             })
+                        } else {
+                            return res.status(200).json({
+                                error: true,
+                                message: 'Old password is incorrect. Please try again.'
+                            })
                         }
                     })
+
                 }
             })
 
