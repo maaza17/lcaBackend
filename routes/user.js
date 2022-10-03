@@ -7,7 +7,7 @@ const verifyAdminToken = require('../helpers/verifyAdminToken')
 const verifyUserToken = require('../helpers/verifyUserToken')
 const {validateLoginInput, validateRegisterInput} = require('../validation/userAuthValidation')
 const adminAddUserValidation = require('../validation/adminAddUserValidation')
-const { sendUserRegistrationEmail, sendAccountVerificationEmail, sendAccountApprovalEmail, sendAdminUserRegistrationEmail, sendLoggedInPasswordResetEmail }  = require('../helpers/nodemailer')
+const {sendUserRegistrationEmail, sendAccountVerificationEmail, sendAccountApprovalEmail, sendAdminUserRegistrationEmail, sendLoggedInPasswordResetEmail, forgotPasswordUserAlert}  = require('../helpers/nodemailer')
 const getConfirmationCode = require('../helpers/getConfirmationCode')
 const generateUserPassword = require('../helpers/generateUserPassword')
 const userModel = require('../models/User')
@@ -739,6 +739,94 @@ router.post('/resetUserPasswordLoggedIn', (req, res) => {
                 }
             })
 
+        }
+    })
+})
+
+router.post('/forgotPasswordRequest', (req, res) => {
+    if(!req.body.email){
+        return res.status(200).json({
+            error: true,
+            message: 'Email is required.'
+        })
+    }
+
+    userModel.findOneAndUpdate({email: req.body.email}, {forgotPassword: true}, {new: true}, (err, newDoc) => {
+        if(err || !newDoc){
+            return res.status(200).json({
+                error: true,
+                message: 'Invalid email. Please make sure you are entering the correct email address associated with your LCA account.'
+            })
+        } else {
+            // send email function here
+            forgotPasswordUserAlert({name:newDoc.name, email:newDoc.email, confirmationCode:newDoc.confirmationCode}, (mailErr, mailInfo) => {
+                if(mailErr){
+                    return res.status(200).json({
+                        error: true,
+                        message: 'An unexpected error occured. Please try again later.'
+                    })
+                } else {
+                    return res.status(200).json({
+                        error: false,
+                        message: "Please check your associated email address for the password reset link."
+                    })
+                }
+            })
+        }
+    })
+})
+
+router.post('/forgotPasswordReset', (req, res) => {
+    if(!req.body.confirmationCode || !req.body.email || !req.body.newPass){
+        return res.status(200).json({
+            error: true,
+            message: 'Invalid credentials.'
+        })
+    }
+
+    userModel.findOne({email: req.body.email, confirmationCode: req.body.confirmationCode, forgotPassword: true}, (err, doc) => {
+        if(err || !doc){
+            return res.status(200).json({
+                error: true,
+                message: 'Password reset link has expired or invalid credentials.'
+            })
+        } else {
+            // ============================================
+            bcrypt.genSalt(10, (saltErr, salt) => {
+                if(saltErr){
+                    return res.status(200).json({
+                        error: true,
+                        message: "An unexpected error occured. Please try again later"
+                    })
+                } else {
+                    bcrypt.hash(req.body.newPass, salt, (hashErr, hash) => {
+                        if(hashErr){
+                            return res.status(200).json({
+                                error: true,
+                                message: "An unexpected error occured. Please try again later"
+                            })
+                        } else {
+                            doc.password = hash
+                            doc.forgotPassword = false
+                            doc.save((saveErr, saveDoc) => {
+                                if(saveErr){
+                                    // console.log(saveErr)
+                                    return res.status(200).json({
+                                        error: true,
+                                        message: "An unexpected error occurred."
+                                    })
+                                } else {
+                                    return res.status(200).json({
+                                        error: false,
+                                        message: 'Your password has been reset. Please continue to the login page.'
+                                    })
+                                }
+                            })
+                        }
+                    })
+                }
+            })
+            // ============================================
         }
     })
 })

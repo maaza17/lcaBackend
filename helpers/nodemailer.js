@@ -76,4 +76,17 @@ function sendLoggedInPasswordResetEmail({name, email}, callback){
     })
 }
 
-module.exports = {sendUserRegistrationEmail, sendAccountVerificationEmail, sendAccountApprovalEmail, sendAdminUserRegistrationEmail, sendLoggedInPasswordResetEmail}
+function forgotPasswordUserAlert({name, email, confirmationCode}, callback){
+    var mailOptions = {
+        from: '"LCA" <' + process.env.NODEMAILER_USER + '>',
+        to: email,
+        subject: 'MNP LCA Password Reset Link',
+        html: '<body><h3>Hello ' + name + '</h3><br /><p>You recently requested to reset your password.</p><br /><p><br />Please reset your password by visiting this <a href="www.google.com/'+confirmationCode+'">link.<a/><br /><br />If you have questions, we are here to help. Email us at random@mulphico.com</p><br /><br /><p>Regards,</p><p>Team LCA</p></body>'
+    }
+
+    transport.sendMail(mailOptions, (mailErr, mailInfo) => {
+        return callback(mailErr, mailInfo)
+    })
+}
+
+module.exports = {sendUserRegistrationEmail, sendAccountVerificationEmail, sendAccountApprovalEmail, sendAdminUserRegistrationEmail, sendLoggedInPasswordResetEmail, forgotPasswordUserAlert}
