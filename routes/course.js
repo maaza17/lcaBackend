@@ -282,74 +282,74 @@ router.post('/addNewCourse', (req, res) => {
 
 })
 
-router.post('/checkEligibility', (req, res) => {
-    if(!req.body.token){
-        return res.status(200).json({
-            error: true,
-            message: 'User token is required to proceed.'
-        })
-    }
+// router.post('/checkEligibility', (req, res) => {
+//     if(!req.body.token){
+//         return res.status(200).json({
+//             error: true,
+//             message: 'User token is required to proceed.'
+//         })
+//     }
 
-    verifyUserToken(req.body.token, (item) => {
-        if((!item) || (!item.isValid)){
-            return res.status(200).json({
-                error: true,
-                message: 'User session expired. Please log in again to proceed.'
-            })
-        } else {
-            let courseID = req.body.courseID?req.body.courseID:null
+//     verifyUserToken(req.body.token, (item) => {
+//         if((!item) || (!item.isValid)){
+//             return res.status(200).json({
+//                 error: true,
+//                 message: 'User session expired. Please log in again to proceed.'
+//             })
+//         } else {
+//             let courseID = req.body.courseID?req.body.courseID:null
 
-            enrollmentModel.findOne({courseId: courseID, userId: item.user_id}, (findOneErr, findOneDoc) => {
-                if(!findOneDoc){
-                    courseModel.findOne({_id: courseID, status: 'Listed'}, (courseErr, course) => {
-                        if(courseErr){
-                            return res.status(200).json({
-                                error: true,
-                                message: 'An unexpected error occurred. Please try again later.'
-                            })
-                        } else if(!course){
-                            return res.status(200).json({
-                                error: true,
-                                message: 'Invalid course.'
-                            })
-                        } else {
-                            if(course.prerequisites.length > 0){
-                                return res.status(200).json({
-                                    error: false,
-                                    message: 'Click to enroll.'
-                                })
-                            } else {
-                                enrollmentModel.find({_id: {$in: course.prerequisites}, userId: item.user_id, completed: true}, (prereqErr, prereqs) => {
-                                    if(prereqErr){
-                                        return res.status(200).json({
-                                            error: true,
-                                            message: 'An unexpected error occurred. Please try again later.'
-                                        })
-                                    } else if(prereqs.length < course.prerequisites){
-                                        return res.status(200).json({
-                                            error: true,
-                                            message: 'Please complete course pre-requisites to enroll.'
-                                        })
-                                    } else {
-                                        return res.status(200).json({
-                                            error: false,
-                                            message: 'Click to enroll.'
-                                        })
-                                    }
-                                })
-                            }
-                        }
-                    })
-                } else {
-                    return res.status(200).json({
-                        error: true,
-                        message: 'Already enrolled.'
-                    })
-                }
-            })                       
-        }
-    })
-})
+//             enrollmentModel.findOne({courseId: courseID, userId: item.user_id}, (findOneErr, findOneDoc) => {
+//                 if(!findOneDoc){
+//                     courseModel.findOne({_id: courseID, status: 'Listed'}, (courseErr, course) => {
+//                         if(courseErr){
+//                             return res.status(200).json({
+//                                 error: true,
+//                                 message: 'An unexpected error occurred. Please try again later.'
+//                             })
+//                         } else if(!course){
+//                             return res.status(200).json({
+//                                 error: true,
+//                                 message: 'Invalid course.'
+//                             })
+//                         } else {
+//                             if(course.prerequisites.length <= 0){
+//                                 return res.status(200).json({
+//                                     error: false,
+//                                     message: 'Click to enroll.'
+//                                 })
+//                             } else {
+//                                 enrollmentModel.find({_id: {$in: course.prerequisites}, userId: item.user_id, completed: true}, (prereqErr, prereqs) => {
+//                                     if(prereqErr){
+//                                         return res.status(200).json({
+//                                             error: true,
+//                                             message: 'An unexpected error occurred. Please try again later.'
+//                                         })
+//                                     } else if(prereqs.length < course.prerequisites){
+//                                         return res.status(200).json({
+//                                             error: true,
+//                                             message: 'Please complete course pre-requisites to enroll.'
+//                                         })
+//                                     } else {
+//                                         return res.status(200).json({
+//                                             error: false,
+//                                             message: 'Click to enroll.'
+//                                         })
+//                                     }
+//                                 })
+//                             }
+//                         }
+//                     })
+//                 } else {
+//                     return res.status(200).json({
+//                         error: true,
+//                         message: 'Already enrolled.'
+//                     })
+//                 }
+//             })                       
+//         }
+//     })
+// })
 
 router.post('/getCourseDetails', (req, res) => {
     if(!req.body.courseID){

@@ -18,7 +18,7 @@ const courseSchema = new mongoose.Schema({
         required: true
     },
     prerequisites: {
-        type: [String],
+        type: [{_id: mongoose.Schema.ObjectId, courseName: String, courseInstructor: String}],
         required: true,
         default: []
     },
@@ -35,6 +35,7 @@ const courseSchema = new mongoose.Schema({
                 lessonName: String,
                 lessonVideo: String,
                 lessionThumbnail: String,
+                isQuiz: Boolean,
                 lessonQuiz: [{
                     question: String,
                     answerOptions: {option1: String, option2: String, option3: String, option4: String},
