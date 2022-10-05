@@ -14,6 +14,11 @@ const AdminSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    confirmationCode: {
+        type: String,
+        required: true,
+        unique: true
+    },
     forgotPassword: {
         type: Boolean,
         required: true,
