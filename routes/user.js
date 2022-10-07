@@ -831,4 +831,94 @@ router.post('/forgotPasswordReset', (req, res) => {
     })
 })
 
+router.post('/deleteUser', (req, res) => {
+    if(!req.body.token){
+        return res.status(200).json({
+            error: true,
+            message: 'Admin token required.'
+        })
+    }
+
+    verifyAdminToken(req.body.token, (item) => {
+        const isAdmin = item.isAdmin;
+        const id = item.id;
+        const name = item.name;
+        if (!isAdmin) {
+            return res.status(200).json({
+                error: true,
+                message: 'Access denied. Limited for admin(s).'
+            })
+        } else {
+            let userID = req.body.userID
+
+            userModel.findOne({_id: userID}, (err, doc) => {
+                if(err || !doc){
+                    return res.status(200).json({
+                        error: true,
+                        message: 'User not found.'
+                    })
+                } else {
+                    if(doc.isEmployee.isTrue){
+                        userModel.deleteOne({_id: userID}, (err, user) => {
+                            if(err){
+                                return res.status(200).json({
+                                    error: true,
+                                    message: 'An unexpected error occured. Please try again later.'
+                                })
+                            } else {
+                                employeeModel.deleteOne({_id: doc.isEmployee.employeeID}, (err, employee) => {
+                                    if(err){
+                                        return res.status(200).json({
+                                            error: true,
+                                            message: 'An unexpected error occured. Please try again later.'
+                                        })
+                                    } else {
+                                        enrollmentModel.deleteMany({userId: userID}, (err, enrollments) => {
+                                            if(err){
+                                                return res.status(200).json({
+                                                    error: true,
+                                                    message: 'An unexpected error occured. Please try again later.'
+                                                })
+                                            } else {
+                                                console.log(user, employee, enrollments)
+                                                return res.status(200).json({
+                                                    error: false,
+                                                    message: 'Employee and associated entities removed successfully.'
+                                                })
+                                            }
+                                        })
+                                    }
+                                })
+                            }
+                        })
+                    } else {
+                        userModel.deleteOne({_id: userID}, (err, doc) => {
+                            if(err){
+                                return res.status(200).json({
+                                    error: true,
+                                    message: 'An unexpected error occured. Please try again later.'
+                                })
+                            } else {
+                                enrollmentModel.deleteMany({userId: userID}, (err, doc) => {
+                                    if(err){
+                                        return res.status(200).json({
+                                            error: true,
+                                            message: 'An unexpected error occured. Please try again later.'
+                                        })
+                                    } else {
+                                        return res.status(200).json({
+                                            error: false,
+                                            message: 'User and associated entities removed successfully.'
+                                        })
+                                    }
+                                })
+                            }
+                        })
+                    }
+                }
+            })
+        }
+    })
+})
+
 module.exports = router
