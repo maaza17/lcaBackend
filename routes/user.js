@@ -504,7 +504,9 @@ router.post('/addUser_Admin', (req, res) => {
                                                                 return res.status(200).json({
                                                                     error: false,
                                                                     message: 'Employee registered as user successfully.',
-                                                                    data: saveDoc
+                                                                    data: saveDoc,
+                                                                    empid: empid,
+                                                                    empname: empname
                                                                 })
                                                             }
                                                         })
