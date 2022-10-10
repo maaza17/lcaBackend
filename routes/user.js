@@ -437,7 +437,9 @@ router.post('/addUser_Admin', (req, res) => {
                             if(findOneErr || !findOneDoc){
                                 return res.status(200).json({
                                     error: true,
-                                    message: 'An unexpected error occured. Please try again later.'
+                                    message: 'An unexpected error occured. Please try again later.',
+                                    empid: empid,
+                                    empname: empname
                                 })
                             } else {
                                 let userPass = generateUserPassword()
@@ -457,14 +459,18 @@ router.post('/addUser_Admin', (req, res) => {
                                     if(saltErr){
                                         return res.status(200).json({
                                             error: true,
-                                            message: "An unexpected error occured. Please try again later"
+                                            message: "An unexpected error occured. Please try again later",
+                                            empid: empid,
+                                            empname: empname
                                         })
                                     } else {
                                         bcrypt.hash(newUser.password, salt, (hashErr, hash) => {
                                             if(hashErr){
                                                 return res.status(200).json({
                                                     error: true,
-                                                    message: "An unexpected error occured. Please try again later"
+                                                    message: "An unexpected error occured. Please try again later",
+                                                    empid: empid,
+                                                    empname: empname
                                                 })
                                             } else {
                                                 newUser.password = hash
@@ -473,12 +479,16 @@ router.post('/addUser_Admin', (req, res) => {
                                                         // console.log(saveErr)
                                                         return res.status(200).json({
                                                             error: true,
-                                                            message: "An account with this email already exists."
+                                                            message: "An account with this email already exists.",
+                                                            empid: empid,
+                                                            empname: empname
                                                         })
                                                     } else if(saveErr){
                                                         return res.status(200).json({
                                                             error: true,
-                                                            message: "An unexpected error occured. Please try again later."
+                                                            message: "An unexpected error occured. Please try again later.",
+                                                            empid: empid,
+                                                            empname: empname
                                                         })
                                                     } else {                    
                                                         sendAdminUserRegistrationEmail({name: saveDoc.name, username: saveDoc.email, password: userPass}, (mailErr, mailInfo) => {
@@ -486,7 +496,9 @@ router.post('/addUser_Admin', (req, res) => {
                                                                 return res.status(200).json({
                                                                     error: true,
                                                                     message: 'An unexpected error occured. Please try again later.',
-                                                                    error_message: mailErr
+                                                                    error_message: mailErr,
+                                                                    empid: empid,
+                                                                    empname: empname
                                                                 })
                                                             } else {
                                                                 return res.status(200).json({
