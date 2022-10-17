@@ -46,8 +46,8 @@ router.post('/changeHeadline', (req, res) => {
                 message: 'Access denied. Limited for admin(s).'
             })
         } else {
-            let {headlineText, description} = req.body
-            homeHeadlineModel.findOneAndUpdate({entityType: 'home_headline'}, {headlineText: headlineText, description: description, lastModified: Date.now()}, {new: true}, (err, doc) => {
+            let {headlineText, description, headlineColor} = req.body
+            homeHeadlineModel.findOneAndUpdate({entityType: 'home_headline'}, {headlineText: headlineText, description: description, headlineColor: headlineColor, descriptionColor:descriptionColor, lastModified: Date.now()}, {new: true}, (err, doc) => {
                 if(err){
                     return res.status(200).json({
                         error: true,

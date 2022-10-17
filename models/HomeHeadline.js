@@ -10,6 +10,14 @@ const homeHeadlineSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    headlineColor: {
+        type: String,
+        required: true
+    },
+    descriptionColor: {
+        type: String,
+        required: true
+    },
     description: {
         type: String,
         required: true
