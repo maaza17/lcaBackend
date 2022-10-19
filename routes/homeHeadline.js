@@ -35,7 +35,6 @@ router.post('/changeHeadline', (req, res) => {
             message: 'Access denied. Admin token not provided.'
         })
     }
-
     verifyAdminToken(req.body.token, (item) => {
         const isAdmin = item.isAdmin;
         const id = item.id;
