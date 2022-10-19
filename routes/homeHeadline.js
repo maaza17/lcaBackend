@@ -52,7 +52,7 @@ router.post('/changeHeadline', (req, res) => {
                 if(err){
                     return res.status(200).json({
                         error: true,
-                        message: 'An unexpected error occured. Please try again later.'
+                        message: 'An unexpected error occurred. Please try again later.'
                     })
                 } else {
                     return res.status(200).json({
