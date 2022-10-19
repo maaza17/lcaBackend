@@ -47,6 +47,7 @@ router.post('/changeHeadline', (req, res) => {
             })
         } else {
             let {headlineText,descriptionColor, description, headlineColor} = req.body
+            console.log(req.body);
             homeHeadlineModel.findOneAndUpdate({entityType: 'home_headline'}, {headlineText: headlineText, description: description, headlineColor: headlineColor, descriptionColor:descriptionColor, lastModified: Date.now()}, {new: true}, (err, doc) => {
                 if(err){
                     return res.status(200).json({
@@ -56,7 +57,7 @@ router.post('/changeHeadline', (req, res) => {
                 } else {
                     return res.status(200).json({
                         error: false,
-                        message: 'Headline changed successfully.',
+                        message: 'Headline changed successfully new.',
                         data: doc
                     })
                 }
