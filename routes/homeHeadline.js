@@ -35,7 +35,7 @@ router.post('/changeHeadline', (req, res) => {
             message: 'Access denied. Admin token not provided.'
         })
     }
-
+    
     verifyAdminToken(req.body.token, (item) => {
         const isAdmin = item.isAdmin;
         const id = item.id;
@@ -47,16 +47,17 @@ router.post('/changeHeadline', (req, res) => {
             })
         } else {
             let {headlineText,descriptionColor, description, headlineColor} = req.body
+            console.log(req.body);
             homeHeadlineModel.findOneAndUpdate({entityType: 'home_headline'}, {headlineText: headlineText, description: description, headlineColor: headlineColor, descriptionColor:descriptionColor, lastModified: Date.now()}, {new: true}, (err, doc) => {
                 if(err){
                     return res.status(200).json({
                         error: true,
-                        message: 'An unexpected error occured. Please try again later.'
+                        message: 'An unexpected error occurred. Please try again later.'
                     })
                 } else {
                     return res.status(200).json({
                         error: false,
-                        message: 'Headline changed successfully.',
+                        message: 'Headline changed successfully new.',
                         data: doc
                     })
                 }
