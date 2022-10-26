@@ -300,7 +300,13 @@ router.post('/checkEligibility', (req, res) => {
             let courseID = req.body.courseID?req.body.courseID:null
 
             enrollmentModel.findOne({courseId: courseID, userId: item.user_id}, (findOneErr, findOneDoc) => {
-                if(!findOneDoc){
+                if(findOneDoc){
+                    return res.status(200).json({
+                        error: true,
+                        message: 'Already enrolled.'
+                    })
+                }
+                else {
                     courseModel.findOne({_id: courseID, status: 'Listed'}, (courseErr, course) => {
                         if(courseErr){
                             return res.status(200).json({
@@ -343,11 +349,6 @@ router.post('/checkEligibility', (req, res) => {
                                 })
                             }
                         }
-                    })
-                } else {
-                    return res.status(200).json({
-                        error: true,
-                        message: 'Already enrolled.'
                     })
                 }
             })                       
