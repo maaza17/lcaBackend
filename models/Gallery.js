@@ -6,6 +6,11 @@ const gallerySchema = new mongoose.Schema({
         required: true,
         default: 'gallery_image'
     },
+    event:{
+        type: String,
+        required: true,
+        default: 'other'
+    },
     imageLink: {
         type: String,
         required: true
