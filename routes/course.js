@@ -510,4 +510,46 @@ router.post('/getEnrolledCourses', (req, res) => {
     })
 })
 
+router.post('/editCourse', (req, res) => {
+    if(!req.body.token){
+        return res.status(200).json({
+            error: true,
+            message: 'Access denied. Admin token not provided.'
+        })
+    }
+
+    verifyAdminToken(req.body.token, (item) => {
+        const isAdmin = item.isAdmin;
+        const id = item.id;
+        const name = item.name;
+        if (!isAdmin) {
+            return res.status(200).json({
+                error: true,
+                message: 'Access denied.'
+            })
+        } else {
+            if(!req.body.course._id){
+                return res.status(200).json({
+                    error: true,
+                    message: 'Updated course required to proceed.'
+                })
+            } else {
+                courseModel.findOneAndUpdate({_id: req.body.course._id}, req.body.course, (err, doc) => {
+                    if(err){
+                        return res.status(200).json({
+                            error: true,
+                            message: 'An unexpected error occured. Please try again later.'
+                        })
+                    } else {
+                        return res.status(200).json({
+                            error: false,
+                            message: 'Course updated successfully.'
+                        })
+                    }
+                })
+            }
+        }
+    })
+})
+
 module.exports = router
