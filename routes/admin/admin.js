@@ -251,7 +251,7 @@ router.post('/forgotPasswordRequest', (req, res) => {
         if (err || !newDoc) {
             return res.status(200).json({
                 error: true,
-                message: 'Invalid email. Please make sure you are entering the correct email address associated with your LCA account.'
+                message: 'Invalid email. Make sure you enter the email associated with your LCA account.'
             })
         } else {
             // send email function here
@@ -277,7 +277,7 @@ router.post('/forgotPasswordReset', (req, res) => {
     if (!req.body.confirmationCode || !req.body.email || !req.body.newPass) {
         return res.status(200).json({
             error: true,
-            message: 'Invalid credentials.'
+            message: 'Please enter all the data required.'
         })
     }
 
