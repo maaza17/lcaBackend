@@ -4,6 +4,7 @@
 
     const app = express();
 
+    const verifyGlobalToken = require('./routes/global')
     const homeHeadlineRoute = require('./routes/homeHeadline')
     const homeBannerRoute = require('./routes/homeBanner')
     const testimonialsRoute = require('./routes/testimonials')
@@ -40,6 +41,7 @@
     .catch((err) => console.log(err));
 
     
+    app.use('/api/global', verifyGlobalToken)
     app.use('/api/homeHeadline', homeHeadlineRoute)
     app.use('/api/homeBanner', homeBannerRoute)
     app.use('/api/testimonials', testimonialsRoute)
