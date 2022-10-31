@@ -62,8 +62,10 @@ router.post('/enrollCourse', (req, res) => {
                                 userId: item.user_id,
                                 courseName: course.courseName,
                                 courseInstructor: course.courseInstructor,
+                                courseThumbnail: course.courseThumbnail,
                                 courseType: course.courseType,
                                 courseContent: content,
+                                courseStats: course.courseStats
                             })
         
                             newEnrollment.save((saveErr, saveDoc) => {

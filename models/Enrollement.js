@@ -19,6 +19,10 @@ const emrollmentSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    courseThumbnail: {
+        type: String,
+        required: true
+    },
     courseType: {
         type: String,
         required: true
@@ -41,6 +45,19 @@ const emrollmentSchema = new mongoose.Schema({
             }]
         }],
         required: true
+    },
+    courseStats: {
+        type: {
+            countSections: Number,
+            countLessons: Number,
+            watchTime: String
+        },
+        required: true,
+        default: {
+            countSections: 0,
+            countLessons: 0,
+            watchTime: 'Not Available'
+        }
     },
     registrationDate: {
         type: Date,
