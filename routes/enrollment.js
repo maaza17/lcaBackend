@@ -169,17 +169,17 @@ router.post('/markLessonCompleted', (req, res) => {
                         message: 'An unexpected error occured. Please try again later.'
                     })
                 } else {
-                    let temp = doc.courseContent
-                    temp = temp.map(section => {
-                        if (section._id == req.body.sectionID) {
-                            let temp_lessons = section.sectionLessons
-                            temp_lessons = temp_lessons.map(lesson => {
-                                if (lesson._id == req.body.lessonID) {
-                                    return { ...lesson, completed: true }
+                    let temp = []
+                    doc.courseContent.forEach(section => {
+                        if(section._id == req.body.sectionID){
+                            section.sectionLessons.forEach(lesson => {
+                                if(lesson._id == req.body.lessonID){
+                                    lesson.completed = true
                                 }
                             })
-                            section.sectionLessons = temp_lessons
-                            return section
+                            temp.push(section)
+                        } else {
+                            temp.push(section)
                         }
                     })
                     doc.courseContent = temp
