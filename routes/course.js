@@ -91,7 +91,7 @@ router.post('/getAllCourses', (req, res) => {
                 message: 'Access denied. Limited for admin(s).'
             })
         } else {
-            courseModel.find({}, {_id: true, courseName: true, courseThumbnail: true, courseAbstract: true, courseInstructor:true, courseType: true, courseStats: true, dateCreated: true, status:true}, (err, docs) => {
+            courseModel.find({}, {_id: true, courseName: true, courseThumbnail: true, courseAbstract: true, courseInstructor:true, courseType: true, courseStats: true, dateAdded: true, status:true}, (err, docs) => {
                 if(err){
                     return res.status(200).json({
                         error: true,
@@ -109,7 +109,7 @@ router.post('/getAllCourses', (req, res) => {
                         data: docs
                     })
                 }
-            })
+            }).sort({dateAdded:-1})
         }
     })
 })
