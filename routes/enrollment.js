@@ -6,7 +6,7 @@ const enrollmentModel = require('../models/Enrollement')
 const courseModel = require('../models/Course')
 
 router.post('/enrollCourse', (req, res) => {
-    if(!req.body.token){
+    if (!req.body.token) {
         return res.status(200).json({
             error: true,
             message: 'User token is required to proceed.'
@@ -14,30 +14,30 @@ router.post('/enrollCourse', (req, res) => {
     }
 
     verifyUserToken(req.body.token, (item) => {
-        if((!item) || (!item.isValid)){
+        if ((!item) || (!item.isValid)) {
             return res.status(200).json({
                 error: true,
                 message: 'User session expired. Please log in again to proceed with enrollment.'
             })
         } else {
-            let courseID = req.body.courseID?req.body.courseID:null
-            if(!courseID){
+            let courseID = req.body.courseID ? req.body.courseID : null
+            if (!courseID) {
                 return res.status(200).json({
                     error: true,
                     message: 'Course id not provided.'
                 })
             }
-            
-            enrollmentModel.findOne({courseId: courseID, userId: item.user_id}, (findOneErr, findOneDoc) => {
-                if(!findOneDoc){
-                    
-                    courseModel.findOne({_id: courseID, status: 'Listed'}, (courseErr, course) => {
-                        if(courseErr){
+
+            enrollmentModel.findOne({ courseId: courseID, userId: item.user_id }, (findOneErr, findOneDoc) => {
+                if (!findOneDoc) {
+
+                    courseModel.findOne({ _id: courseID, status: 'Listed' }, (courseErr, course) => {
+                        if (courseErr) {
                             return res.status(200).json({
                                 error: true,
                                 message: 'An unexpected error occured. Please try again later.'
                             })
-                        } else if(!course){
+                        } else if (!course) {
                             return res.status(200).json({
                                 error: true,
                                 message: 'Attempt to enroll in an invalid course.'
@@ -45,7 +45,7 @@ router.post('/enrollCourse', (req, res) => {
                         } else {
                             let content = []
                             course.courseContent.forEach(section => {
-                                let tempSection = {_id: section._id, sectionTitle: section.sectionTitle, sectionAbstract: section.sectionAbstract, sectionLessons: []}
+                                let tempSection = { _id: section._id, sectionTitle: section.sectionTitle, sectionAbstract: section.sectionAbstract, sectionLessons: [] }
                                 section.sectionLessons.forEach(lesson => {
                                     let tempLesson = {
                                         _id: lesson._id, lessonNumber: lesson.lessonNumber, lessonName: lesson.lessonName,
@@ -56,18 +56,20 @@ router.post('/enrollCourse', (req, res) => {
                                 })
                                 content.push(tempSection)
                             })
-                            
+
                             let newEnrollment = new enrollmentModel({
                                 courseId: courseID,
                                 userId: item.user_id,
                                 courseName: course.courseName,
                                 courseInstructor: course.courseInstructor,
+                                courseThumbnail: course.courseThumbnail,
                                 courseType: course.courseType,
                                 courseContent: content,
+                                courseStats: course.courseStats
                             })
-        
+
                             newEnrollment.save((saveErr, saveDoc) => {
-                                if(saveErr){
+                                if (saveErr) {
                                     console.log(saveErr)
                                     return res.status(200).json({
                                         error: true,
@@ -95,7 +97,7 @@ router.post('/enrollCourse', (req, res) => {
 })
 
 router.post('/deEnrollCourse', (req, res) => {
-    if(!req.body.token){
+    if (!req.body.token) {
         return res.status(200).json({
             error: true,
             message: 'User token is required to proceed.'
@@ -103,25 +105,25 @@ router.post('/deEnrollCourse', (req, res) => {
     }
 
     verifyUserToken(req.body.token, (item) => {
-        if((!item) || (!item.isValid)){
+        if ((!item) || (!item.isValid)) {
             return res.status(200).json({
                 error: true,
                 message: 'User session expired. Please log in again to proceed with de-enrollment.'
             })
         } else {
-            if(!req.body.enrollmentID){
+            if (!req.body.enrollmentID) {
                 return res.status(200).json({
                     error: true,
                     message: "Course enrollment ID is required. Please try again later."
                 })
             }
-            enrollmentModel.findOneAndDelete({_id: req.body.enrollmentID}, (err, deleted) => {
-                if(err){
+            enrollmentModel.findOneAndDelete({ _id: req.body.enrollmentID }, (err, deleted) => {
+                if (err) {
                     return res.status(200).json({
                         error: true,
                         message: 'An unexpected error occured. Please try again later.'
                     })
-                } else if(!deleted){
+                } else if (!deleted) {
                     return res.status(200).json({
                         error: true,
                         message: 'Invalid course enrollment. Can not de-enroll.'
@@ -139,7 +141,7 @@ router.post('/deEnrollCourse', (req, res) => {
 
 router.post('/markLessonCompleted', (req, res) => {
     // console.log(req.body)
-    if(!req.body.token){
+    if (!req.body.token) {
         return res.status(200).json({
             error: true,
             message: 'User token is required to proceed.'
@@ -147,43 +149,43 @@ router.post('/markLessonCompleted', (req, res) => {
     }
 
     verifyUserToken(req.body.token, (item) => {
-        if((!item) || (!item.isValid)){
+        if ((!item) || (!item.isValid)) {
             return res.status(200).json({
                 error: true,
                 message: 'User session expired. Please log in again to proceed.'
             })
         } else {
-            if(!req.body.enrollmentID || !req.body.sectionID || !req.body.lessonID){
+            if (!req.body.enrollmentID || !req.body.sectionID || !req.body.lessonID) {
                 return res.status(200).json({
                     error: true,
                     message: 'Parameter(s) missing.'
                 })
             }
 
-            enrollmentModel.findOne({_id: req.body.enrollmentID}, (err, doc) => {
-                if(err){
+            enrollmentModel.findOne({ _id: req.body.enrollmentID }, (err, doc) => {
+                if (err) {
                     return res.status(200).json({
                         error: true,
                         message: 'An unexpected error occured. Please try again later.'
                     })
                 } else {
-                    let temp = doc.courseContent
-                    temp = temp.map(section => {
+                    let temp = []
+                    doc.courseContent.forEach(section => {
                         if(section._id == req.body.sectionID){
-                            let temp_lessons = section.sectionLessons
-                            temp_lessons = temp_lessons.map(lesson => {
+                            section.sectionLessons.forEach(lesson => {
                                 if(lesson._id == req.body.lessonID){
-                                    return {...lesson, completed: true}
+                                    lesson.completed = true
                                 }
                             })
-                            section.sectionLessons = temp_lessons
-                            return section
+                            temp.push(section)
+                        } else {
+                            temp.push(section)
                         }
                     })
                     doc.courseContent = temp
 
-                    enrollmentModel.findOneAndUpdate({_id: req.body.enrollmentID}, doc, {new: true}, (newErr, newDoc) => {
-                        if(newErr){
+                    enrollmentModel.findOneAndUpdate({ _id: req.body.enrollmentID }, doc, { new: true }, (newErr, newDoc) => {
+                        if (newErr) {
                             return res.status(200).json({
                                 error: true,
                                 message: 'An unexpected error occured. Please try again later.'
@@ -200,6 +202,40 @@ router.post('/markLessonCompleted', (req, res) => {
             })
         }
     })
+})
+
+router.post('/getSingleEnrolled', (req, res) => {
+    if (!req.body.token) {
+        return res.status(200).json({
+            error: true,
+            message: 'User token is required.'
+        })
+    } else {
+        verifyUserToken(req.body.token, (item) => {
+            if ((!item) || (!item.isValid)) {
+                return res.status(200).json({
+                    error: true,
+                    message: 'User session expired. Please log in again to proceed.'
+                })
+            } else {
+                let courseID = req.body.courseID ? req.body.courseID : ''
+                enrollmentModel.findOne({ userId: item.user_id, courseId: courseID }, (err, doc) => {
+                    if (err || !doc) {
+                        return res.status(200).json({
+                            error: true,
+                            message: 'An unexpected error occurred. Please try again later.'
+                        })
+                    } else {
+                        return res.status(200).json({
+                            error: false,
+                            message: 'Enrolled course found.',
+                            data: doc
+                        })
+                    }
+                })
+            }
+        })
+    }
 })
 
 module.exports = router
