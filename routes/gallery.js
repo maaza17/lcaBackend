@@ -86,8 +86,6 @@ router.post('/uploadGalleryMedia', (req, res) => {
 
     verifyAdminToken(req.body.token, (item) => {
         const isAdmin = item.isAdmin;
-        const id = item.id;
-        const name = item.name;
         if (!isAdmin) {
             return res.status(200).json({
                 error: true,
@@ -95,16 +93,6 @@ router.post('/uploadGalleryMedia', (req, res) => {
             })
         } else {
             let newMedia = req.body.newMedia
-            // newMedia = [
-            //     {
-            //         "altText": "gallery.jpeg",
-            //         "imageLink": "www.gmail.com"
-            //     },
-            //     {
-            //         "altText": "gallery.jpeg",
-            //         "imageLink": "www.gmail.com"
-            //     }
-            // ]
             galleryModel.insertMany(newMedia)
             .then((media) => {
                 return res.status(200).json({
