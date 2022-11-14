@@ -368,7 +368,7 @@ router.post('/getCourseDetails', (req, res) => {
         if(err){
             return res.status(200).json({
                 error: true,
-                message: 'An unexpected error occured. Please try again later.'
+                message: 'An unexpected error occurred. Please try again later.'
             })
         } else if(!course){
             return res.status(200).json({
@@ -447,7 +447,7 @@ router.post('/checkAvailability', (req, res) => {
                         console.log(err.message)
                         return res.status(200).json({
                             error: true,
-                            message: 'An unexpected error occured. Please try again later.'
+                            message: 'An unexpected error occurred. Please try again later.'
                         })
                     } else {
                         return res.status(200).json({
@@ -462,7 +462,7 @@ router.post('/checkAvailability', (req, res) => {
                     if(err){
                         return res.status(200).json({
                             error: true,
-                            message: 'An unexpected error occured. Please try again later.'
+                            message: 'An unexpected error occurred. Please try again later.'
                         })
                     } else {
                         return res.status(200).json({
@@ -496,7 +496,7 @@ router.post('/getEnrolledCourses', (req, res) => {
                 if(err){
                     return res.status(200).json({
                         error: true,
-                        message: 'An unexpected error occured. Please try again later.'
+                        message: 'An unexpected error occurred. Please try again later.'
                     })
                 } else {
                     return res.status(200).json({
@@ -538,7 +538,7 @@ router.post('/editCourse', (req, res) => {
                     if(err){
                         return res.status(200).json({
                             error: true,
-                            message: 'An unexpected error occured. Please try again later.'
+                            message: 'An unexpected error occurred. Please try again later.'
                         })
                     } else {
                         return res.status(200).json({
