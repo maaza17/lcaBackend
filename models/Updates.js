@@ -27,6 +27,11 @@ const updatesSchema = new mongoose.Schema({
         type: Date,
         required: false,
         default: Date.now()
+    },
+    isDeleted: {
+        type: Boolean,
+        required: false,
+        default: false
     }
 })
 
