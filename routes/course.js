@@ -536,29 +536,10 @@ router.post('/getEnrolledCourses', (req, res) => {
                                 message: 'An unexpected error occurred. Please try again later.'
                             })
                         } else {
-                            let final = [];
-                            for (var i = 0; i < docs.length; i++) {
-                                let ind = -1;
-                                documents.map((item, index) => {
-                                    if (item._id.equals(docs[i].courseId)) { ind = index };
-                                })
-                                final.push({
-                                    courseId: docs[i].courseId,
-                                    userId: docs[i].userId,
-                                    score: docs[i].score,
-                                    maxScore: docs[i].maxScore,
-                                    sectionIndex: docs[i].sectionIndex,
-                                    lessonIndex: docs[i].lessonIndex,
-                                    registrationDate: docs[i].registrationDate,
-                                    completed: docs[i].completed,
-                                    completedDate: docs[i].completedDate,
-                                    courseContent: (ind === -1) ? null : documents[ind]
-                                })
-                            }
                             return res.status(200).json({
                                 error: false,
                                 message: 'Enrolled courses retrieved successfully.',
-                                data: final
+                                data: documents
                             })
                         }
                     })
