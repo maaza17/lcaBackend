@@ -1,6 +1,6 @@
 const mongoose = require('mongoose')
 
-const emrollmentSchema = new mongoose.Schema({
+const enrollmentSchema = new mongoose.Schema({
     courseId: {
         type: mongoose.Schema.ObjectId,
         ref: 'course',
@@ -11,69 +11,42 @@ const emrollmentSchema = new mongoose.Schema({
         ref: 'user',
         required: true
     },
-    courseName: {
-        type: String,
-        required: true
+    score: {
+        type: Number,
+        required: false,
+        default: 0
     },
-    courseInstructor: {
-        type: String,
-        required: true
+    maxScore: {
+        type: Number,
+        required: false,
+        default: 0
     },
-    courseThumbnail: {
-        type: String,
-        required: true
+    sectionIndex: {
+        type: Number,
+        required: false,
+        default: 0
     },
-    courseType: {
-        type: String,
-        required: true
-    },
-    courseContent: {
-        type:[{
-            sectionTitle: String,
-            sectionAbstract: String,
-            sectionLessons: [{
-                lessonNumber: Number,
-                lessonName: String,
-                lessonVideo: String,
-                lessionThumbnail: String,
-                lessonQuiz: [{
-                    question: String,
-                    answerOptions: [String],
-                    correctAnswer: String
-                }],
-                completed: Boolean
-            }]
-        }],
-        required: true
-    },
-    courseStats: {
-        type: {
-            countSections: Number,
-            countLessons: Number,
-            watchTime: String
-        },
-        required: true,
-        default: {
-            countSections: 0,
-            countLessons: 0,
-            watchTime: 'Not Available'
-        }
+    lessonIndex: {
+        type: Number,
+        required: false,
+        default: 0
     },
     registrationDate: {
         type: Date,
-        required: true,
+        required: false,
         default: Date.now()
     },
     completed: {
         type: Boolean,
-        required: true,
+        required: false,
         default: false
     },
     completedDate: {
         type: Date,
+        required: false,
         default: null
     }
 })
 
-enrollmentModel = new mongoose.model('enrollment', emrollmentSchema)
+enrollmentModel = new mongoose.model('enrollment', enrollmentSchema)
 module.exports = enrollmentModel

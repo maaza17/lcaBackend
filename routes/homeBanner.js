@@ -10,7 +10,7 @@ router.get('/getHomeBanner', (req, res) => {
         if(err){
             return res.status(200).json({
                 error: true,
-                message: 'An unexpected error occured. Please try again later'
+                message: 'An unexpected error occurred. Please try again later'
             })
         } else if(doc) {
             return res.status(200).json({
@@ -21,7 +21,7 @@ router.get('/getHomeBanner', (req, res) => {
         } else {
             return res.status(200).json({
                 error: true,
-                message: 'An unexpected error occured. Please try again later'
+                message: 'An unexpected error occurred. Please try again later'
             })
         }
     })
@@ -51,7 +51,7 @@ router.post('/changeBanner', (req, res) => {
                 if(err){
                     return res.status(200).json({
                         error: true,
-                        message: 'An unexpected error occured. Please try again later.'
+                        message: 'An unexpected error occurred. Please try again later.'
                     })
                 } else {
                     return res.status(200).json({

@@ -28,7 +28,7 @@ router.post('/loginAdmin', (req, res) => {
         if (err) {
             return res.status(200).json({
                 error: true,
-                message: "An unexpected error occured. Please try again"
+                message: "An unexpected error occurred. Please try again"
             })
         } else if (admin) {
             // compare passwords and token generation here
@@ -48,7 +48,7 @@ router.post('/loginAdmin', (req, res) => {
                             console.log(signErr)
                             return res.status.json({
                                 error: true,
-                                message: "An unexpected error occured. Please try again"
+                                message: "An unexpected error occurred. Please try again"
                             })
                         } else {
                             console.log('admin login success')
@@ -161,7 +161,7 @@ router.post('/resetAdminPasswordLoggedIn', (req, res) => {
                 if (err) {
                     return res.status(200).json({
                         error: true,
-                        message: 'An Unexpected error occured. Please try again later.'
+                        message: 'An Unexpected error occurred. Please try again later.'
                     })
                 } else if (!doc) {
                     return res.status(200).json({
@@ -200,7 +200,7 @@ router.post('/resetAdminPasswordLoggedIn', (req, res) => {
                                                     if (saveErr) {
                                                         return res.status(200).json({
                                                             error: true,
-                                                            message: 'An Unexpected error occured. Please try again later.'
+                                                            message: 'An Unexpected error occurred. Please try again later.'
                                                         })
                                                     } else {
                                                         // send password reset email here
@@ -208,7 +208,7 @@ router.post('/resetAdminPasswordLoggedIn', (req, res) => {
                                                             if (mailErr) {
                                                                 return res.status(200).json({
                                                                     error: true,
-                                                                    message: 'An unexpected error occured. Please try again later.',
+                                                                    message: 'An unexpected error occurred. Please try again later.',
                                                                     error_message: mailErr
                                                                 })
                                                             } else {
@@ -259,7 +259,7 @@ router.post('/forgotPasswordRequest', (req, res) => {
                 if (mailErr) {
                     return res.status(200).json({
                         error: true,
-                        message: 'An unexpected error occured. Please try again later.'
+                        message: 'An unexpected error occurred. Please try again later.'
                     })
                 } else {
                     return res.status(200).json({
@@ -285,7 +285,7 @@ router.post('/forgotPasswordReset', (req, res) => {
         if (err) {
             return res.status(200).json({
                 error: true,
-                message: 'An unexpected error occured retrieving your details. Please try again.'
+                message: 'An unexpected error occurred retrieving your details. Please try again.'
             })
         } else if (!doc) {
             return res.status(200).json({
@@ -304,14 +304,14 @@ router.post('/forgotPasswordReset', (req, res) => {
                     if (saltErr) {
                         return res.status(200).json({
                             error: true,
-                            message: "An unexpected error occured processing your request. Please try again later"
+                            message: "An unexpected error occurred processing your request. Please try again later"
                         })
                     } else {
                         bcrypt.hash(req.body.newPass, salt, (hashErr, hash) => {
                             if (hashErr) {
                                 return res.status(200).json({
                                     error: true,
-                                    message: "An unexpected error occured in the server. Please try again later"
+                                    message: "An unexpected error occurred in the server. Please try again later"
                                 })
                             } else {
                                 doc.password = hash

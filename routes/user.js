@@ -39,14 +39,14 @@ router.post('/registeruser', (req, res) => {
             if(saltErr){
                 return res.status(200).json({
                     error: true,
-                    message: "An unexpected error occured. Please try again later"
+                    message: "An unexpected error occurred. Please try again later"
                 })
             } else {
                 bcrypt.hash(newUser.password, salt, (hashErr, hash) => {
                     if(hashErr){
                         return res.status(200).json({
                             error: true,
-                            message: "An unexpected error occured. Please try again later"
+                            message: "An unexpected error occurred. Please try again later"
                         })
                     } else {
                         newUser.password = hash
@@ -60,7 +60,7 @@ router.post('/registeruser', (req, res) => {
                             } else if(saveErr){
                                 return res.status(200).json({
                                     error: true,
-                                    message: "An unexpected error occured. Please try again later."
+                                    message: "An unexpected error occurred. Please try again later."
                                 })
                             } else {
 
@@ -68,7 +68,7 @@ router.post('/registeruser', (req, res) => {
                                     if(mailErr){
                                         return res.status(200).json({
                                             error: true,
-                                            message: 'An unexpected error occured. Please try again later.',
+                                            message: 'An unexpected error occurred. Please try again later.',
                                             error_message: mailErr
                                         })
                                     } else {
@@ -134,7 +134,7 @@ router.post('/loginuser', (req, res) => {
                     if(passErr){
                         return res.status(200).json({
                             error: true,
-                            message: 'An unexpected error occured. Please Try again later'
+                            message: 'An unexpected error occurred. Please Try again later'
                         })
                     }
                 })
@@ -158,7 +158,7 @@ router.post('/loginuser', (req, res) => {
                                 console.log('user token sign error')
                                 return res.status(200).json({
                                     error: true,
-                                    message: 'An unexpected error occured. Please try again later.'
+                                    message: 'An unexpected error occurred. Please try again later.'
                                 })
                             } else {
                                 console.log('user login success')
@@ -209,7 +209,7 @@ router.post('/approveuser', (req, res) => {
                 if(err){
                     return res.status(200).json({
                         error: true,
-                        message: 'An unexpected error occured. Please try again later.'
+                        message: 'An unexpected error occurred. Please try again later.'
                     })
                 } else if(!updatedUser){
                     return res.status(200).json({
@@ -221,7 +221,7 @@ router.post('/approveuser', (req, res) => {
                         if(mailErr){
                             return res.status(200).json({
                                 error: true,
-                                message: 'An unexpected error occured. Please try again later.',
+                                message: 'An unexpected error occurred. Please try again later.',
                                 error_message: mailErr
                             })
                         } else {
@@ -263,7 +263,7 @@ router.post('/suspendusers', (req, res) => {
                 if(err){
                     return res.status(200).json({
                         error: true,
-                        message: 'An unexpected error occured. Please try again later.'
+                        message: 'An unexpected error occurred. Please try again later.'
                     })
                 } else if(updatedUsers.matchedCount <= 0){
                     return res.status(200).json({
@@ -308,7 +308,7 @@ router.post('/reinstateusers', (req, res) => {
                 if(err){
                     return res.status(200).json({
                         error: true,
-                        message: 'An unexpected error occured. Please try again later.'
+                        message: 'An unexpected error occurred. Please try again later.'
                     })
                 } else if(updatedUsers.matchedCount <= 0){
                     return res.status(200).json({
@@ -344,7 +344,7 @@ router.post('/verifyuseremail', (req, res) => {
             console.log('find err')
             return res.status(200).json({
                 error: true,
-                message: 'An unexpected error occured. Please try again later.'
+                message: 'An unexpected error occurred. Please try again later.'
             })
         } else if(!doc){
             console.log('doc not found')
@@ -360,7 +360,7 @@ router.post('/verifyuseremail', (req, res) => {
                     console.log(saveErr)
                     return res.status(200).json({
                         error: true,
-                        message: 'An unexpected error occured. Please try again later.'
+                        message: 'An unexpected error occurred. Please try again later.'
                     })
                 } else {
                     sendAccountVerificationEmail({name: saveDoc.name, email: saveDoc.email}, (mailErr, mailInfo) => {
@@ -368,7 +368,7 @@ router.post('/verifyuseremail', (req, res) => {
                             console.log('mail err')
                             return res.status(200).json({
                                 error: true,
-                                message: 'An unexpected error occured. Please try again later.'
+                                message: 'An unexpected error occurred. Please try again later.'
                             })
                         } else {
                             return res.status(200).json({
@@ -437,7 +437,7 @@ router.post('/addUser_Admin', (req, res) => {
                             if(findOneErr || !findOneDoc){
                                 return res.status(200).json({
                                     error: true,
-                                    message: 'An unexpected error occured. Please try again later.',
+                                    message: 'An unexpected error occurred. Please try again later.',
                                     empid: empid,
                                     empname: empname
                                 })
@@ -459,7 +459,7 @@ router.post('/addUser_Admin', (req, res) => {
                                     if(saltErr){
                                         return res.status(200).json({
                                             error: true,
-                                            message: "An unexpected error occured. Please try again later",
+                                            message: "An unexpected error occurred. Please try again later",
                                             empid: empid,
                                             empname: empname
                                         })
@@ -468,7 +468,7 @@ router.post('/addUser_Admin', (req, res) => {
                                             if(hashErr){
                                                 return res.status(200).json({
                                                     error: true,
-                                                    message: "An unexpected error occured. Please try again later",
+                                                    message: "An unexpected error occurred. Please try again later",
                                                     empid: empid,
                                                     empname: empname
                                                 })
@@ -486,7 +486,7 @@ router.post('/addUser_Admin', (req, res) => {
                                                     } else if(saveErr){
                                                         return res.status(200).json({
                                                             error: true,
-                                                            message: "An unexpected error occured. Please try again later.",
+                                                            message: "An unexpected error occurred. Please try again later.",
                                                             empid: empid,
                                                             empname: empname
                                                         })
@@ -495,7 +495,7 @@ router.post('/addUser_Admin', (req, res) => {
                                                             if(mailErr){
                                                                 return res.status(200).json({
                                                                     error: true,
-                                                                    message: 'An unexpected error occured. Please try again later.',
+                                                                    message: 'An unexpected error occurred. Please try again later.',
                                                                     error_message: mailErr,
                                                                     empid: empid,
                                                                     empname: empname
@@ -524,12 +524,12 @@ router.post('/addUser_Admin', (req, res) => {
                         console.log(empSaveErr)
                         return res.status(200).json({
                             error: true,
-                            message: 'An unexpected error occured. Please try again later.'
+                            message: 'An unexpected error occurred. Please try again later.'
                         })
                     } else if(!empSaveDoc){
                         return res.status(200).json({
                             error: true,
-                            message: 'An unexpected error occured. Please try again later.'
+                            message: 'An unexpected error occurred. Please try again later.'
                         })
                     } else {
                         let userPass = generateUserPassword()
@@ -549,14 +549,14 @@ router.post('/addUser_Admin', (req, res) => {
                             if(saltErr){
                                 return res.status(200).json({
                                     error: true,
-                                    message: "An unexpected error occured. Please try again later"
+                                    message: "An unexpected error occurred. Please try again later"
                                 })
                             } else {
                                 bcrypt.hash(newUser.password, salt, (hashErr, hash) => {
                                     if(hashErr){
                                         return res.status(200).json({
                                             error: true,
-                                            message: "An unexpected error occured. Please try again later"
+                                            message: "An unexpected error occurred. Please try again later"
                                         })
                                     } else {
                                         newUser.password = hash
@@ -570,14 +570,14 @@ router.post('/addUser_Admin', (req, res) => {
                                             } else if(saveErr){
                                                 return res.status(200).json({
                                                     error: true,
-                                                    message: "An unexpected error occured. Please try again later."
+                                                    message: "An unexpected error occurred. Please try again later."
                                                 })
                                             } else {                    
                                                 sendAdminUserRegistrationEmail({name: saveDoc.name, username: saveDoc.email, password: userPass}, (mailErr, mailInfo) => {
                                                     if(mailErr){
                                                         return res.status(200).json({
                                                             error: true,
-                                                            message: 'An unexpected error occured. Please try again later.',
+                                                            message: 'An unexpected error occurred. Please try again later.',
                                                             error_message: mailErr
                                                         })
                                                     } else {
@@ -627,7 +627,7 @@ router.post('/getAllUsers', (req, res) => {
                 if(err){
                     return res.status(200).json({
                         error: true,
-                        message: 'An unexpected error occured. Please try again later.'
+                        message: 'An unexpected error occurred. Please try again later.'
                     })
                 } else if(docs.length <= 0){
                     return res.status(200).json({
@@ -680,7 +680,7 @@ router.post('/resetUserPasswordLoggedIn', (req, res) => {
                 if(err){
                     return res.status(200).json({
                         error: true,
-                        message: 'An Unexpected error occured. Please try again later.'
+                        message: 'An Unexpected error occurred. Please try again later.'
                     })
                 } else if(!doc){
                     return res.status(200).json({
@@ -703,14 +703,14 @@ router.post('/resetUserPasswordLoggedIn', (req, res) => {
                                 if(saltErr){
                                     return res.status(200).json({
                                         error: true,
-                                        message: 'Unexpected error occured. Please try again later.'
+                                        message: 'Unexpected error occurred. Please try again later.'
                                     })
                                 } else {
                                     bcrypt.hash(req.body.newPass, salt, (hashErr, hash) => {
                                         if(hashErr){
                                             return res.status(200).json({
                                                 error: true,
-                                                message: 'Unexpected error occured. Please try again later.'
+                                                message: 'Unexpected error occurred. Please try again later.'
                                             })
                                         } else {
                                             doc.password = hash
@@ -718,7 +718,7 @@ router.post('/resetUserPasswordLoggedIn', (req, res) => {
                                                 if(saveErr){
                                                     return res.status(200).json({
                                                         error: true,
-                                                        message: 'An Unexpected error occured. Please try again later.'
+                                                        message: 'An Unexpected error occurred. Please try again later.'
                                                     })
                                                 } else {
                                                     // send password reset email here
@@ -726,7 +726,7 @@ router.post('/resetUserPasswordLoggedIn', (req, res) => {
                                                         if(mailErr){
                                                             return res.status(200).json({
                                                                 error: true,
-                                                                message: 'An unexpected error occured. Please try again later.',
+                                                                message: 'An unexpected error occurred. Please try again later.',
                                                                 error_message: mailErr
                                                             })
                                                         } else {
@@ -777,7 +777,7 @@ router.post('/forgotPasswordRequest', (req, res) => {
                 if(mailErr){
                     return res.status(200).json({
                         error: true,
-                        message: 'An unexpected error occured. Please try again later.'
+                        message: 'An unexpected error occurred. Please try again later.'
                     })
                 } else {
                     return res.status(200).json({
@@ -810,14 +810,14 @@ router.post('/forgotPasswordReset', (req, res) => {
                 if(saltErr){
                     return res.status(200).json({
                         error: true,
-                        message: "An unexpected error occured. Please try again later"
+                        message: "An unexpected error occurred. Please try again later"
                     })
                 } else {
                     bcrypt.hash(req.body.newPass, salt, (hashErr, hash) => {
                         if(hashErr){
                             return res.status(200).json({
                                 error: true,
-                                message: "An unexpected error occured. Please try again later"
+                                message: "An unexpected error occurred. Please try again later"
                             })
                         } else {
                             doc.password = hash
@@ -877,21 +877,21 @@ router.post('/deleteUser', (req, res) => {
                             if(err){
                                 return res.status(200).json({
                                     error: true,
-                                    message: 'An unexpected error occured. Please try again later.'
+                                    message: 'An unexpected error occurred. Please try again later.'
                                 })
                             } else {
                                 employeeModel.deleteOne({_id: doc.isEmployee.employeeID}, (err, employee) => {
                                     if(err){
                                         return res.status(200).json({
                                             error: true,
-                                            message: 'An unexpected error occured. Please try again later.'
+                                            message: 'An unexpected error occurred. Please try again later.'
                                         })
                                     } else {
                                         enrollmentModel.deleteMany({userId: userID}, (err, enrollments) => {
                                             if(err){
                                                 return res.status(200).json({
                                                     error: true,
-                                                    message: 'An unexpected error occured. Please try again later.'
+                                                    message: 'An unexpected error occurred. Please try again later.'
                                                 })
                                             } else {
                                                 console.log(user, employee, enrollments)
@@ -910,14 +910,14 @@ router.post('/deleteUser', (req, res) => {
                             if(err){
                                 return res.status(200).json({
                                     error: true,
-                                    message: 'An unexpected error occured. Please try again later.'
+                                    message: 'An unexpected error occurred. Please try again later.'
                                 })
                             } else {
                                 enrollmentModel.deleteMany({userId: userID}, (err, doc) => {
                                     if(err){
                                         return res.status(200).json({
                                             error: true,
-                                            message: 'An unexpected error occured. Please try again later.'
+                                            message: 'An unexpected error occurred. Please try again later.'
                                         })
                                     } else {
                                         return res.status(200).json({

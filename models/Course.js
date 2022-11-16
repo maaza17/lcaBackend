@@ -34,11 +34,11 @@ const courseSchema = new mongoose.Schema({
                 lessonNumber: Number,
                 lessonName: String,
                 lessonVideo: String,
-                lessionThumbnail: String,
+                lessonThumbnail: String,
                 isQuiz: Boolean,
                 lessonQuiz: [{
                     question: String,
-                    answerOptions: {option1: String, option2: String, option3: String, option4: String},
+                    answerOptions: [{option1: String, option2: String, option3: String, option4: String}],
                     correctAnswer: String
                 }]
             }]
@@ -76,7 +76,7 @@ const courseSchema = new mongoose.Schema({
         type: String,
         enum: ['Listed', 'Hidden'],
         required: true,
-        default: 'Hidden'
+        default: 'Listed'
     },
     dateAdded: {
         type: Date,
