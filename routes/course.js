@@ -279,13 +279,13 @@ router.post('/addNewCourse', (req, res) => {
                         type: 'education',
                     })
                     newUpdate.save((err, update) => {
-                        if(err){
+                        if (err) {
                             return res.status(200).json({
                                 error: false,
                                 message: 'Course added successfully. Error when trying to post update.',
                                 data: course
                             })
-                        }else{
+                        } else {
                             return res.status(200).json({
                                 error: false,
                                 message: 'Course added successfully. Update posted as well.',
@@ -518,10 +518,49 @@ router.post('/getEnrolledCourses', (req, res) => {
                         message: 'An unexpected error occurred. Please try again later.'
                     })
                 } else {
-                    return res.status(200).json({
-                        error: false,
-                        message: 'Enrolled courses retrieved successfully.',
-                        data: docs
+                    if (docs.length === 0) {
+                        return res.status(200).json({
+                            error: false,
+                            message: 'No Enrolled courses.',
+                            data: []
+                        })
+                    }
+                    let search = [];
+                    for (var i = 0; i < docs.length; i++) {
+                        search.push(docs[i].courseId);
+                    }
+                    courseModel.find({ _id: { $in: search } }, (err, documents) => {
+                        if (err) {
+                            return res.status(200).json({
+                                error: true,
+                                message: 'An unexpected error occurred. Please try again later.'
+                            })
+                        } else {
+                            let final = [];
+                            for (var i = 0; i < docs.length; i++) {
+                                let ind = -1;
+                                documents.map((item, index) => {
+                                    if (item._id.equals(docs[i].courseId)) { ind = index };
+                                })
+                                final.push({
+                                    courseId: docs[i].courseId,
+                                    userId: docs[i].userId,
+                                    score: docs[i].score,
+                                    maxScore: docs[i].maxScore,
+                                    sectionIndex: docs[i].sectionIndex,
+                                    lessonIndex: docs[i].lessonIndex,
+                                    registrationDate: docs[i].registrationDate,
+                                    completed: docs[i].completed,
+                                    completedDate: docs[i].completedDate,
+                                    courseContent: (ind === -1) ? null : documents[ind]
+                                })
+                            }
+                            return res.status(200).json({
+                                error: false,
+                                message: 'Enrolled courses retrieved successfully.',
+                                data: final
+                            })
+                        }
                     })
                 }
             })
