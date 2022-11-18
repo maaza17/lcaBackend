@@ -2,19 +2,20 @@ const router = require('express').Router()
 const mongoose = require('mongoose')
 const jwt = require("jsonwebtoken")
 const courseModel = require('../models/Course')
+const updateModel = require('../models/Updates')
 const enrollmentModel = require('../models/Enrollement')
 const verifyAdminToken = require('../helpers/verifyAdminToken')
 const verifyUserToken = require('../helpers/verifyUserToken')
 
 router.get('/getListedCourses', (req, res) => {
 
-    courseModel.find({status: 'Listed'}, {_id: true, courseName: true, courseThumbnail: true, courseAbstract: true, courseInstructor:true, courseType: true, courseStats: true, dateCreated: true}, (err, docs) => {
-        if(err){
+    courseModel.find({ status: 'Listed' }, { _id: true, courseName: true, courseThumbnail: true, courseAbstract: true, courseInstructor: true, courseType: true, courseStats: true, dateCreated: true }, (err, docs) => {
+        if (err) {
             return res.status(200).json({
                 error: true,
                 message: 'An unexpected error occurred. Please try again later.'
             })
-        } else if(docs.length <= 0){
+        } else if (docs.length <= 0) {
             return res.status(200).json({
                 error: true,
                 message: 'No active course listings found.'
@@ -31,7 +32,7 @@ router.get('/getListedCourses', (req, res) => {
 
 router.post('/getHiddenCourses', (req, res) => {
 
-    if(!req.body.token){
+    if (!req.body.token) {
         return res.status(200).json({
             error: true,
             message: 'Access denied. Admin token not provided.'
@@ -48,13 +49,13 @@ router.post('/getHiddenCourses', (req, res) => {
                 message: 'Access denied. Limited for admin(s).'
             })
         } else {
-            courseModel.find({status: 'Hidden'}, {_id: true, courseName: true, courseThumbnail: true, courseAbstract: true, courseInstructor:true, courseType: true, courseStats: true, dateCreated: true}, (err, docs) => {
-                if(err){
+            courseModel.find({ status: 'Hidden' }, { _id: true, courseName: true, courseThumbnail: true, courseAbstract: true, courseInstructor: true, courseType: true, courseStats: true, dateCreated: true }, (err, docs) => {
+                if (err) {
                     return res.status(200).json({
                         error: true,
                         message: 'An unexpected error occurred. Please try again later.'
                     })
-                } else if(docs.length <= 0){
+                } else if (docs.length <= 0) {
                     return res.status(200).json({
                         error: true,
                         message: 'No hidden course listings found.'
@@ -74,7 +75,7 @@ router.post('/getHiddenCourses', (req, res) => {
 
 router.post('/getAllCourses', (req, res) => {
 
-    if(!req.body.token){
+    if (!req.body.token) {
         return res.status(200).json({
             error: true,
             message: 'Access denied. Admin token not provided.'
@@ -91,13 +92,13 @@ router.post('/getAllCourses', (req, res) => {
                 message: 'Access denied. Limited for admin(s).'
             })
         } else {
-            courseModel.find({}, {_id: true, courseName: true, courseThumbnail: true, courseAbstract: true, courseInstructor:true, courseType: true, courseStats: true, dateAdded: true, status:true}, (err, docs) => {
-                if(err){
+            courseModel.find({}, { _id: true, courseName: true, courseThumbnail: true, courseAbstract: true, courseInstructor: true, courseType: true, courseStats: true, dateAdded: true, status: true }, (err, docs) => {
+                if (err) {
                     return res.status(200).json({
                         error: true,
                         message: 'An unexpected error occurred. Please try again later.'
                     })
-                } else if(docs.length <= 0){
+                } else if (docs.length <= 0) {
                     return res.status(200).json({
                         error: true,
                         message: 'No hidden course listings found.'
@@ -109,14 +110,14 @@ router.post('/getAllCourses', (req, res) => {
                         data: docs
                     })
                 }
-            }).sort({dateAdded:-1})
+            }).sort({ dateAdded: -1 })
         }
     })
 })
 
 router.post('/hideListedCourse', (req, res) => {
 
-    if(!req.body.token){
+    if (!req.body.token) {
         return res.status(200).json({
             error: true,
             message: 'Access denied. Admin token not provided.'
@@ -135,13 +136,13 @@ router.post('/hideListedCourse', (req, res) => {
         } else {
             let courseID = req.body.courseID
 
-            courseModel.findOneAndUpdate({_id: courseID, status: 'Listed'}, {status: 'Hidden'}, {new: true}, (err, hiddenCourse) => {
-                if(err){
+            courseModel.findOneAndUpdate({ _id: courseID, status: 'Listed' }, { status: 'Hidden' }, { new: true }, (err, hiddenCourse) => {
+                if (err) {
                     return res.status(200).json({
                         error: true,
                         message: 'An unexpected error occurred. Please try again later.'
                     })
-                } else if(!hiddenCourse){
+                } else if (!hiddenCourse) {
                     return res.status(200).json({
                         error: true,
                         message: 'Course is already hidden or attempt to hide an invalid course.'
@@ -160,7 +161,7 @@ router.post('/hideListedCourse', (req, res) => {
 
 router.post('/listHiddenCourse', (req, res) => {
 
-    if(!req.body.token){
+    if (!req.body.token) {
         return res.status(200).json({
             error: true,
             message: 'Access denied. Admin token not provided.'
@@ -179,13 +180,13 @@ router.post('/listHiddenCourse', (req, res) => {
         } else {
             let courseID = req.body.courseID
 
-            courseModel.findOneAndUpdate({_id: courseID, status: 'Hidden'}, {status: 'Listed'}, {new: true}, (err, listedCourse) => {
-                if(err){
+            courseModel.findOneAndUpdate({ _id: courseID, status: 'Hidden' }, { status: 'Listed' }, { new: true }, (err, listedCourse) => {
+                if (err) {
                     return res.status(200).json({
                         error: true,
                         message: 'An unexpected error occurred. Please try again later.'
                     })
-                } else if(!listedCourse){
+                } else if (!listedCourse) {
                     return res.status(200).json({
                         error: true,
                         message: 'Course is already listed or attempt to list an invalid course.'
@@ -204,7 +205,7 @@ router.post('/listHiddenCourse', (req, res) => {
 
 router.post('/addNewCourse', (req, res) => {
 
-    if(!req.body.token){
+    if (!req.body.token) {
         return res.status(200).json({
             error: true,
             message: 'Access denied. Admin token not provided.'
@@ -221,7 +222,7 @@ router.post('/addNewCourse', (req, res) => {
                 message: 'Access denied. Limited for admin(s).'
             })
         } else {
-            if(!req.body.course){
+            if (!req.body.course) {
                 return res.status(200).json({
                     error: true,
                     message: 'Course to be added not provided.'
@@ -239,9 +240,9 @@ router.post('/addNewCourse', (req, res) => {
             let watchTime = req.body.course.watchTime
 
             // compute course stats
-            let countSections=0
-            let countLessons=0
-            if(courseContent.length > 0){
+            let countSections = 0
+            let countLessons = 0
+            if (courseContent.length > 0) {
                 courseContent.forEach((section) => {
                     countSections = countSections + 1
                     section.sectionLessons.forEach((lesson) => {
@@ -260,20 +261,38 @@ router.post('/addNewCourse', (req, res) => {
                 courseAbstract: courseAbstract,
                 courseContent: courseContent,
                 availability: availability,
-                courseStats: {countSections: countSections, countLessons: countLessons, watchTime: watchTime}
+                courseStats: { countSections: countSections, countLessons: countLessons, watchTime: watchTime }
             })
 
             newCourse.save((err, course) => {
-                if(err){
+                if (err) {
                     return res.status(200).json({
                         error: true,
                         message: 'An unexpected error occurred. Please try again later.'
                     })
                 } else {
-                    return res.status(200).json({
-                        error: false,
-                        message: 'Course added successfully. Head over to the hidden courses section to review and list the course.',
-                        data: course
+                    newUpdate = new updateModel({
+                        date: Date.now(),
+                        heading: "New Course Available : " + courseName,
+                        text: "Hello learners, there is a new course added for you to learn. " + courseName + " is available now by " + courseInstructor + ". Log in to your user account now and enroll away. Happy Learning!!",
+                        imageLink: courseThumbnail,
+                        type: 'education',
+                    })
+                    newUpdate.save((err, update) => {
+                        if (err) {
+                            return res.status(200).json({
+                                error: false,
+                                message: 'Course added successfully. Error when trying to post update.',
+                                data: course
+                            })
+                        } else {
+                            return res.status(200).json({
+                                error: false,
+                                message: 'Course added successfully. Update posted as well.',
+                                data: course,
+                                update: update
+                            })
+                        }
                     })
                 }
             })
@@ -283,7 +302,7 @@ router.post('/addNewCourse', (req, res) => {
 })
 
 router.post('/checkEligibility', (req, res) => {
-    if(!req.body.token){
+    if (!req.body.token) {
         return res.status(200).json({
             error: true,
             message: 'User token is required to proceed.'
@@ -291,35 +310,35 @@ router.post('/checkEligibility', (req, res) => {
     }
 
     verifyUserToken(req.body.token, (item) => {
-        if((!item) || (!item.isValid)){
+        if ((!item) || (!item.isValid)) {
             return res.status(200).json({
                 error: true,
                 message: 'User session expired. Please log in again to proceed.'
             })
         } else {
-            let courseID = req.body.courseID?req.body.courseID:null
+            let courseID = req.body.courseID ? req.body.courseID : null
 
-            enrollmentModel.findOne({courseId: courseID, userId: item.user_id}, (findOneErr, findOneDoc) => {
-                if(findOneDoc){
+            enrollmentModel.findOne({ courseId: courseID, userId: item.user_id }, (findOneErr, findOneDoc) => {
+                if (findOneDoc) {
                     return res.status(200).json({
                         error: true,
                         message: 'Already enrolled.'
                     })
                 }
                 else {
-                    courseModel.findOne({_id: courseID, status: 'Listed'}, (courseErr, course) => {
-                        if(courseErr){
+                    courseModel.findOne({ _id: courseID, status: 'Listed' }, (courseErr, course) => {
+                        if (courseErr) {
                             return res.status(200).json({
                                 error: true,
                                 message: 'An unexpected error occurred. Please try again later.'
                             })
-                        } else if(!course){
+                        } else if (!course) {
                             return res.status(200).json({
                                 error: true,
                                 message: 'Invalid course.'
                             })
                         } else {
-                            if(course.prerequisites.length <= 0){
+                            if (course.prerequisites.length <= 0) {
                                 return res.status(200).json({
                                     error: false,
                                     message: 'Click to enroll.'
@@ -329,13 +348,13 @@ router.post('/checkEligibility', (req, res) => {
                                 course.prerequisites.forEach((prereq) => {
                                     prereq_temp.push(prereq._id)
                                 })
-                                enrollmentModel.find({_id: {$in: prereq_temp}, userId: item.user_id, completed: true}, (prereqErr, prereqs) => {
-                                    if(prereqErr){
+                                enrollmentModel.find({ _id: { $in: prereq_temp }, userId: item.user_id, completed: true }, (prereqErr, prereqs) => {
+                                    if (prereqErr) {
                                         return res.status(200).json({
                                             error: true,
                                             message: 'An unexpected error occurred. Please try again later.'
                                         })
-                                    } else if(prereqs.length < course.prerequisites){
+                                    } else if (prereqs.length < course.prerequisites) {
                                         return res.status(200).json({
                                             error: true,
                                             message: 'Please complete course pre-requisites to enroll.'
@@ -351,26 +370,26 @@ router.post('/checkEligibility', (req, res) => {
                         }
                     })
                 }
-            })                       
+            })
         }
     })
 })
 
 router.post('/getCourseDetails', (req, res) => {
-    if(!req.body.courseID){
+    if (!req.body.courseID) {
         return res.status(200).json({
             error: true,
-            message:'Course ID is required.'
+            message: 'Course ID is required.'
         })
     }
 
-    courseModel.findOne({_id: req.body.courseID}, (err, course) => {
-        if(err){
+    courseModel.findOne({ _id: req.body.courseID }, (err, course) => {
+        if (err) {
             return res.status(200).json({
                 error: true,
                 message: 'An unexpected error occurred. Please try again later.'
             })
-        } else if(!course){
+        } else if (!course) {
             return res.status(200).json({
                 error: true,
                 message: 'Course not found.'
@@ -386,7 +405,7 @@ router.post('/getCourseDetails', (req, res) => {
 })
 
 router.post('/getprereqdropdown', (req, res) => {
-    if(!req.body.token){
+    if (!req.body.token) {
         return res.status(200).json({
             error: true,
             message: 'Access denied. Admin token not provided.'
@@ -403,13 +422,13 @@ router.post('/getprereqdropdown', (req, res) => {
                 message: 'Access denied.'
             })
         } else {
-            courseModel.find({}, {_id: true, courseName: true, courseInstructor: true}, (err, docs) => {
-                if(err){
+            courseModel.find({}, { _id: true, courseName: true, courseInstructor: true }, (err, docs) => {
+                if (err) {
                     return res.status(200).json({
                         error: true,
                         message: 'An unexpected error occurred. Please try again later.'
                     })
-                } else if(docs.length <= 0){
+                } else if (docs.length <= 0) {
                     return res.status(200).json({
                         error: true,
                         message: 'No course listings found.'
@@ -427,7 +446,7 @@ router.post('/getprereqdropdown', (req, res) => {
 })
 
 router.post('/checkAvailability', (req, res) => {
-    if(!req.body.token){
+    if (!req.body.token) {
         return res.status(200).json({
             error: true,
             message: 'User token is required to proceed.'
@@ -435,15 +454,15 @@ router.post('/checkAvailability', (req, res) => {
     }
 
     verifyUserToken(req.body.token, (item) => {
-        if((!item) || (!item.isValid)){
+        if ((!item) || (!item.isValid)) {
             return res.status(200).json({
                 error: true,
                 message: 'User session expired. Please log in again to proceed.'
             })
         } else {
-            if(item.isEmployee.isTrue){
-                courseModel.find({"availability.forEmployees": true, "availability.employeeList": {$elemMatch: {employeeID: item.isEmployee.employeeID}}}, {_id: true}, (err, docs) => {
-                    if(err){
+            if (item.isEmployee.isTrue) {
+                courseModel.find({ "availability.forEmployees": true, "availability.employeeList": { $elemMatch: { employeeID: item.isEmployee.employeeID } } }, { _id: true }, (err, docs) => {
+                    if (err) {
                         console.log(err.message)
                         return res.status(200).json({
                             error: true,
@@ -458,8 +477,8 @@ router.post('/checkAvailability', (req, res) => {
                     }
                 })
             } else {
-                courseModel.find({"availability.forExternals": true}, {_id: true}, (err, docs) => {
-                    if(err){
+                courseModel.find({ "availability.forExternals": true }, { _id: true }, (err, docs) => {
+                    if (err) {
                         return res.status(200).json({
                             error: true,
                             message: 'An unexpected error occurred. Please try again later.'
@@ -478,7 +497,7 @@ router.post('/checkAvailability', (req, res) => {
 })
 
 router.post('/getEnrolledCourses', (req, res) => {
-    if(!req.body.token){
+    if (!req.body.token) {
         return res.status(200).json({
             error: true,
             message: 'User token is required to proceed.'
@@ -486,23 +505,43 @@ router.post('/getEnrolledCourses', (req, res) => {
     }
 
     verifyUserToken(req.body.token, (item) => {
-        if((!item) || (!item.isValid)){
+        if ((!item) || (!item.isValid)) {
             return res.status(200).json({
                 error: true,
                 message: 'User session expired. Please log in again to proceed.'
             })
         } else {
-            enrollmentModel.find({userId: item.user_id}, (err, docs) => {
-                if(err){
+            enrollmentModel.find({ userId: item.user_id }, (err, docs) => {
+                if (err) {
                     return res.status(200).json({
                         error: true,
                         message: 'An unexpected error occurred. Please try again later.'
                     })
                 } else {
-                    return res.status(200).json({
-                        error: false,
-                        message: 'Enrolled courses retrieved successfully.',
-                        data: docs
+                    if (docs.length === 0) {
+                        return res.status(200).json({
+                            error: false,
+                            message: 'No Enrolled courses.',
+                            data: []
+                        })
+                    }
+                    let search = [];
+                    for (var i = 0; i < docs.length; i++) {
+                        search.push(docs[i].courseId);
+                    }
+                    courseModel.find({ _id: { $in: search } }, (err, documents) => {
+                        if (err) {
+                            return res.status(200).json({
+                                error: true,
+                                message: 'An unexpected error occurred. Please try again later.'
+                            })
+                        } else {
+                            return res.status(200).json({
+                                error: false,
+                                message: 'Enrolled courses retrieved successfully.',
+                                data: documents
+                            })
+                        }
                     })
                 }
             })
@@ -511,7 +550,7 @@ router.post('/getEnrolledCourses', (req, res) => {
 })
 
 router.post('/editCourse', (req, res) => {
-    if(!req.body.token){
+    if (!req.body.token) {
         return res.status(200).json({
             error: true,
             message: 'Access denied. Admin token not provided.'
@@ -528,14 +567,14 @@ router.post('/editCourse', (req, res) => {
                 message: 'Access denied.'
             })
         } else {
-            if(!req.body.course._id){
+            if (!req.body.course._id) {
                 return res.status(200).json({
                     error: true,
                     message: 'Updated course required to proceed.'
                 })
             } else {
-                courseModel.findOneAndUpdate({_id: req.body.course._id}, req.body.course, (err, doc) => {
-                    if(err){
+                courseModel.findOneAndUpdate({ _id: req.body.course._id }, req.body.course, (err, doc) => {
+                    if (err) {
                         return res.status(200).json({
                             error: true,
                             message: 'An unexpected error occurred. Please try again later.'

@@ -76,7 +76,7 @@ const courseSchema = new mongoose.Schema({
         type: String,
         enum: ['Listed', 'Hidden'],
         required: true,
-        default: 'Hidden'
+        default: 'Listed'
     },
     dateAdded: {
         type: Date,
