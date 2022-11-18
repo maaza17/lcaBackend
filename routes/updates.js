@@ -37,13 +37,13 @@ router.post('/editUpdate', (req, res) => {
         if (!isAdmin) {
             return res.status(200).json({
                 error: true,
-                message: 'Access denied. Limited for admin(s).'
+                message: 'Access denied. Limited for admin(s). Please try logging in again'
             })
         } else {
             if (!req.body._id) {
                 return res.status(200).json({
                     error: true,
-                    message: "Update object id is required."
+                    message: "Event object id is required."
                 })
             }
             updatesModel.findOneAndUpdate({ _id: req.body._id }, {
@@ -61,12 +61,12 @@ router.post('/editUpdate', (req, res) => {
                 } else if (!doc) {
                     return res.status(200).json({
                         error: true,
-                        message: 'Update not found. Please recheck object.'
+                        message: 'Event not found. Please recheck object.'
                     })
                 } else {
                     return res.status(200).json({
                         error: false,
-                        message: 'Update updated successfully.',
+                        message: 'Event updated successfully.',
                         data: doc
                     })
                 }
@@ -108,7 +108,7 @@ router.post('/addUpdate', (req, res) => {
                 } else {
                     return res.status(200).json({
                         error: false,
-                        message: 'Update added successfully.',
+                        message: 'Event added successfully.',
                         data: newDoc
                     })
                 }
@@ -139,7 +139,7 @@ router.post('/deleteUpdate', (req, res) => {
             if (!req.body._id) {
                 return res.status(200).json({
                     error: true,
-                    message: "Update object id is required."
+                    message: "Event object id is required."
                 })
             }
             updatesModel.findOneAndDelete({ _id: req.body._id }, (err, doc) => {
@@ -151,12 +151,12 @@ router.post('/deleteUpdate', (req, res) => {
                 } else if (!doc) {
                     return res.status(200).json({
                         error: true,
-                        message: 'Update not found. Please recheck object.'
+                        message: 'Event not found. Please recheck object.'
                     })
                 } else {
                     return res.status(200).json({
                         error: false,
-                        message: 'Update deleted successfully.',
+                        message: 'Event deleted successfully.',
                         data: doc
                     })
                 }
