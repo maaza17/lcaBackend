@@ -15,6 +15,7 @@ const userRoute = require('./routes/user')
 const courseRoute = require('./routes/course')
 const enrollmentRoute = require('./routes/enrollment')
 const updatesRoute = require('./routes/updates')
+const booksRoute = require('./routes/books')
 const trainingRoute = require('./routes/trainings')
 
 app.use(express.urlencoded({ extended: true, limit: 20000000 }));
@@ -53,6 +54,7 @@ app.use('/api/users', userRoute)
 app.use('/api/courses', courseRoute)
 app.use('/api/enrollment', enrollmentRoute)
 app.use('/api/updates', updatesRoute)
+app.use('/api/books', booksRoute)
 app.use('/api/trainings', trainingRoute)
 
 
