@@ -5,7 +5,7 @@ const verifyUserToken = require('../helpers/verifyUserToken');
 // create training registration email - for both self and manager nomination and import & use here
 
 // for listing in admin panel
-router.post('/getAllTrainings', (req, res) => {
+router.get('/getAllTrainings', (req, res) => {
     trainingModel.find({}, (err, trainings) => {
         if(err) {
             return res.status(200).json({
