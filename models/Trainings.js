@@ -43,14 +43,19 @@ const trainingSchema = new mongoose.Schema({
     }],
     eventType: {
         type: String,
-        enum: ['Online', 'Physical'],
+        enum: ['online', 'physical'],
         required: true,
         default: 'Physical'
     },
     dateCreated: {
         type: Date,
-        required: true,
+        required: false,
         default: Date.now()
+    },
+    isDeleted: {
+        type: Boolean,
+        required: false,
+        default: false
     }
 })
 
