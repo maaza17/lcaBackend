@@ -12,12 +12,6 @@ router.get('/getAllTrainings', (req, res) => {
                 error: true,
                 message: 'An unexpected error occurred. Please try again later.'
             })
-        } else if(trainings.length === 0) {
-            return res.status(200).json({
-                error: true,
-                message: 'No trainings found.',
-                data: trainings
-            })
         } else {
             return res.status(200).json({
                 error: false,
