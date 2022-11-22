@@ -37,13 +37,13 @@ router.post('/editUpdate', (req, res) => {
         if (!isAdmin) {
             return res.status(200).json({
                 error: true,
-                message: 'Access denied. Limited for admin(s).'
+                message: 'Access denied. Limited for admin(s). Please try logging in again'
             })
         } else {
             if (!req.body._id) {
                 return res.status(200).json({
                     error: true,
-                    message: "Update object id is required."
+                    message: "Event object id is required."
                 })
             }
             updatesModel.findOneAndUpdate({ _id: req.body._id }, {
@@ -61,12 +61,12 @@ router.post('/editUpdate', (req, res) => {
                 } else if (!doc) {
                     return res.status(200).json({
                         error: true,
-                        message: 'Update not found. Please recheck object.'
+                        message: 'Event not found. Please recheck object.'
                     })
                 } else {
                     return res.status(200).json({
                         error: false,
-                        message: 'Update updated successfully.',
+                        message: 'Event updated successfully.',
                         data: doc
                     })
                 }
@@ -108,7 +108,7 @@ router.post('/addUpdate', (req, res) => {
                 } else {
                     return res.status(200).json({
                         error: false,
-                        message: 'Update added successfully.',
+                        message: 'Event added successfully.',
                         data: newDoc
                     })
                 }
@@ -117,7 +117,7 @@ router.post('/addUpdate', (req, res) => {
     })
 })
 
-router.post('/deleteUpdate', (req, res) => {
+router.post('/delete', (req, res) => {
 
     if (!req.body.token) {
         return res.status(200).json({
@@ -136,13 +136,13 @@ router.post('/deleteUpdate', (req, res) => {
                 message: 'Access denied. Limited for admin(s).'
             })
         } else {
-            if (!req.body._id) {
+            if (!req.body.ID) {
                 return res.status(200).json({
                     error: true,
-                    message: "Update object id is required."
+                    message: "Event object id is required."
                 })
             }
-            updatesModel.findOneAndDelete({ _id: req.body._id }, (err, doc) => {
+            updatesModel.findOneAndUpdate({ _id: req.body.ID }, { isDeleted: true }, (err, doc) => {
                 if (err) {
                     return res.status(200).json({
                         error: true,
@@ -157,6 +157,54 @@ router.post('/deleteUpdate', (req, res) => {
                     return res.status(200).json({
                         error: false,
                         message: 'Update deleted successfully.',
+                        data: doc
+                    })
+                }
+            })
+        }
+    })
+})
+
+router.post('/retrieve', (req, res) => {
+
+    if (!req.body.token) {
+        return res.status(200).json({
+            error: true,
+            message: 'Access denied. Admin token not provided.'
+        })
+    }
+
+    verifyAdminToken(req.body.token, (item) => {
+        const isAdmin = item.isAdmin;
+        const id = item.id;
+        const name = item.name;
+        if (!isAdmin) {
+            return res.status(200).json({
+                error: true,
+                message: 'Access denied. Limited for admin(s).'
+            })
+        } else {
+            if (!req.body.ID) {
+                return res.status(200).json({
+                    error: true,
+                    message: "Update object id is required."
+                })
+            }
+            updatesModel.findOneAndUpdate({ _id: req.body.ID }, { isDeleted: false }, (err, doc) => {
+                if (err) {
+                    return res.status(200).json({
+                        error: true,
+                        message: 'An unexpected error occurred. Please try again later.'
+                    })
+                } else if (!doc) {
+                    return res.status(200).json({
+                        error: true,
+                        message: 'Event not found. Please recheck object.'
+                    })
+                } else {
+                    return res.status(200).json({
+                        error: false,
+                        message: 'Event deleted successfully.',
                         data: doc
                     })
                 }
