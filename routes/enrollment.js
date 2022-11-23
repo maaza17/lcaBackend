@@ -224,7 +224,7 @@ router.post('/score', (req, res) => {
                         } else {
                             return res.status(200).json({
                                 error: false,
-                                message: 'Updated successfully.',
+                                message: 'Quiz Submitted.',
                                 data: newDoc
                             })
                         }
