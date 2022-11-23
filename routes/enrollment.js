@@ -149,7 +149,7 @@ router.post('/updateProgress', (req, res) => {
                 message: 'User session expired. Please log in again to proceed.'
             })
         } else {
-            if (!req.body.enrollmentID || req.body.sectionIndex!==null || req.body.lessonIndex!==null) {
+            if (!req.body.enrollmentID || req.body.sectionIndex===null || req.body.lessonIndex===null) {
                 return res.status(200).json({
                     error: true,
                     message: 'Parameter(s) missing.'
