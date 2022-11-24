@@ -50,6 +50,11 @@ const userSchema = new mongoose.Schema({
         type: Boolean,
         required: true,
         default: false
+    },
+    department: {
+        type: String,
+        required: false,
+        default: "Not Employed"
     }
 })
 
