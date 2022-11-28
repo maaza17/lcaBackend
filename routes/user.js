@@ -171,7 +171,9 @@ router.post('/loginuser', (req, res) => {
                                             _id: user._id,
                                             name: user.name,
                                             email: user.email,
-                                            isEmployee: user.isEmployee
+                                            isEmployee: user.isEmployee,
+                                            occupation: user.occupation,
+                                            email: user.email
                                         }
                                     })
                                 }
@@ -937,4 +939,5 @@ router.post('/deleteUser', (req, res) => {
     })
 })
 
+// get underlings
 module.exports = router
