@@ -11,6 +11,7 @@ function verifyUserToken(token, callback) {
                 isEmployee: null
             });
         } else if (decoded) {
+            // console.log(decoded)
             // console.log('decoded block')
             return callback({
                 isValid: true,
@@ -18,7 +19,9 @@ function verifyUserToken(token, callback) {
                 name: decoded.name,
                 isEmployee: decoded.isEmployee,
                 occupation: decoded.occupation,
-                email: decoded.email
+                email: decoded.email,
+                internalID: decoded.internalID,
+                lineManagerID: decoded.lineManagerID
             })
         } else {
             // console.log('null block')
@@ -28,7 +31,9 @@ function verifyUserToken(token, callback) {
                 name: null,
                 isEmployee: null,
                 occupation: null,
-                email: null
+                email: null,
+                internalID: null,
+                lineManagerID: null
             });
         }
     })
