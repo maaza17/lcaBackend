@@ -21,6 +21,23 @@ router.get('/getUpdates', (req, res) => {
     }).sort({ date: "desc" })
 })
 
+router.get('/getActiveUpdates', (req, res) => {
+    updatesModel.find({ isDeleted: false }, (err, docs) => {
+        if (docs) {
+            return res.status(200).json({
+                error: false,
+                message: 'Here you go good sir.',
+                data: docs
+            })
+        } else {
+            return res.status(200).json({
+                error: true,
+                message: 'An unexpected error occurred while fetching updates'
+            })
+        }
+    }).sort({ date: "desc" })
+})
+
 router.post('/editUpdate', (req, res) => {
 
     if (!req.body.token) {
