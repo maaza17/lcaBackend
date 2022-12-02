@@ -142,13 +142,14 @@ router.post('/updateProgress', (req, res) => {
     }
 
     verifyUserToken(req.body.token, (item) => {
+        
         if ((!item) || (!item.isValid)) {
             return res.status(200).json({
                 error: true,
                 message: 'User session expired. Please log in again to proceed.'
             })
         } else {
-            if (!req.body.enrollmentID || !req.body.sectionID || !req.body.lessonID) {
+            if (!req.body.enrollmentID || req.body.sectionIndex===null || req.body.lessonIndex===null) {
                 return res.status(200).json({
                     error: true,
                     message: 'Parameter(s) missing.'
@@ -224,7 +225,7 @@ router.post('/score', (req, res) => {
                         } else {
                             return res.status(200).json({
                                 error: false,
-                                message: 'Updated successfully.',
+                                message: 'Quiz Submitted.',
                                 data: newDoc
                             })
                         }
@@ -322,7 +323,7 @@ router.post('/markAsCompleted', (req, res) => {
                         } else {
                             return res.status(200).json({
                                 error: false,
-                                message: 'Updated successfully.',
+                                message: 'Course Completed.',
                                 data: newDoc
                             })
                         }
