@@ -11,12 +11,17 @@ function verifyUserToken(token, callback) {
                 isEmployee: null
             });
         } else if (decoded) {
+            // console.log(decoded)
             // console.log('decoded block')
             return callback({
                 isValid: true,
                 user_id: decoded.userID,
                 name: decoded.name,
-                isEmployee: decoded.isEmployee
+                isEmployee: decoded.isEmployee,
+                occupation: decoded.occupation,
+                email: decoded.email,
+                internalID: decoded.internalID,
+                lineManagerID: decoded.lineManagerID
             })
         } else {
             // console.log('null block')
@@ -24,7 +29,11 @@ function verifyUserToken(token, callback) {
                 isValid: false,
                 user_id: null,
                 name: null,
-                isEmployee: null
+                isEmployee: null,
+                occupation: null,
+                email: null,
+                internalID: null,
+                lineManagerID: null
             });
         }
     })

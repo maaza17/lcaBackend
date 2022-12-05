@@ -35,11 +35,12 @@ const trainingSchema = new mongoose.Schema({
         required: true
     },
     participants: [{
-        _id: mongoose.Schema.ObjectId,
+        userID: {type: mongoose.Schema.ObjectId, ref: 'user', unique: true},
         name: String,
         email: String,
         occupation: String,
-        isEmployee: Boolean
+        isEmployee: Boolean,
+        _id: false
     }],
     eventType: {
         type: String,

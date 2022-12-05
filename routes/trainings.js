@@ -295,13 +295,77 @@ router.post('/getActiveTrainingsForUser', (req, res) => {
 })
 
 // self nomination
+router.post('/selfNomiation', (req, res) => {
+    if(!req.body.token){
+        return res.status(200).json({
+            error: true,
+            message: 'Login required.'
+        })
+    }
+
+    verifyUserToken(req.body.token, (item) => {
+        if ((!item) || (!item.isValid)) {
+            return res.status(200).json({
+                error: true,
+                message: 'User session expired. Please log in again to proceed.'
+            })
+        } else {
+            trainingModel.findOneAndUpdate({_id: req.body.trainingID}, {participants: {$push: {userID: item.user_id, name: item.name, email: item.email, occupation: item.occupation, isEmployee: item.isEmployee}}}, (err, doc) => {
+                if(err){
+                    return res.status(200).json({
+                        error: true,
+                        message: 'An unexpected error occurred. Please try again later.'
+                    })
+                } else {
+                    return res.status(200).json({
+                        error: false,
+                        message: 'Self nomination successful.',
+                        data: doc
+                    })
+                }
+            })
+        }
+    })
+})
 
 // nomination by manager
+router.post('/nominateByManager', (req, res) => {
+    if(!req.body.token){
+        return res.status(200).json({
+            error: true,
+            message: 'Login required.'
+        })
+    }
 
-// add new training
+    verifyUserToken(req.body.token, (item) => {
+        if ((!item) || (!item.isValid)) {
+            return res.status(200).json({
+                error: true,
+                message: 'User session expired. Please log in again to proceed.'
+            })
+        } else {
+            if(!req.body.nominations || req.body.nominations.length <= 0 || !req.body.trainingID){
+                return res.status(200).json({
+                    error: true,
+                    message: 'Required parameters are missing.'
+                })
+            }
 
-// edit training
-
-// delete training
-
+            trainingModel.findOneAndUpdate({_id: req.body.trainingID}, {participants: {$push: req.body.nominations}}, (err, doc) => {
+                if(err){
+                    return res.status(200).json({
+                        error: true,
+                        message: 'An unexpected error occurred. Please try again later.'
+                    })
+                } else {
+                    return res.status(200).json({
+                        error: false,
+                        message: 'Nominations successful.',
+                        data: doc
+                    })
+                }
+            })
+        }
+    })
+})
 module.exports = router;

@@ -145,33 +145,48 @@ router.post('/loginuser', (req, res) => {
                                 message: 'Incorrect password. Please try again later'
                             })
                         } else {
-                            const payload = {
-                                userID: user._id,
-                                name: user.name,
-                                email: user.email,
-                                organization: user.organization,
-                                isEmployee: user.isEmployee
-                            }
 
-                            jwt.sign(payload, process.env.ENCRYPTION_SECRET_USER, { expiresIn: 172800 }, (signErr, userToken) => {
-                                if (signErr) {
-                                    console.log('user token sign error')
+                            employeeModel.findOne({ _id: user.isEmployee.employeeID }, (empErr, empDoc) => {
+                                if(empErr){
                                     return res.status(200).json({
                                         error: true,
-                                        message: 'An unexpected error occurred. Please try again later.'
+                                        message: 'An unexpected error occurred. Please Try again later'
                                     })
                                 } else {
-                                    console.log('user login success')
-                                    return res.status(200).json({
-                                        error: false,
-                                        token: userToken,
-                                        message: 'Login successful.',
-                                        userType: 'User',
-                                        user: {
-                                            _id: user._id,
-                                            name: user.name,
-                                            email: user.email,
-                                            isEmployee: user.isEmployee
+                                    console.log("employee", empDoc)
+                                    const payload = {
+                                        userID: user._id,
+                                        name: user.name,
+                                        email: user.email,
+                                        organization: user.organization,
+                                        isEmployee: user.isEmployee,
+                                        internalID: empDoc ? empDoc.empid : null,
+                                        lineManagerID: empDoc ? empDoc.emplinemanagerid : null,
+                                    }
+    
+                                    jwt.sign(payload, process.env.ENCRYPTION_SECRET_USER, { expiresIn: 172800 }, (signErr, userToken) => {
+                                        if (signErr) {
+                                            console.log('user token sign error')
+                                            return res.status(200).json({
+                                                error: true,
+                                                message: 'An unexpected error occurred. Please try again later.'
+                                            })
+                                        } else {
+                                            console.log('user login success')
+                                            return res.status(200).json({
+                                                error: false,
+                                                token: userToken,
+                                                message: 'Login successful.',
+                                                userType: 'User',
+                                                user: {
+                                                    _id: user._id,
+                                                    name: user.name,
+                                                    email: user.email,
+                                                    isEmployee: user.isEmployee,
+                                                    occupation: user.occupation,
+                                                    email: user.email
+                                                }
+                                            })
                                         }
                                     })
                                 }
@@ -442,7 +457,8 @@ router.post('/addUser_Admin', (req, res) => {
                                     empname: empname
                                 })
                             } else {
-                                let userPass = generateUserPassword()
+                                // let userPass = generateUserPassword()
+                                let userPass = "1234567890"
                                 let newUser = new userModel({
                                     name: empname,
                                     email: empemail,
@@ -937,4 +953,59 @@ router.post('/deleteUser', (req, res) => {
     })
 })
 
+// get underlings
+router.post('/getUnderlings', (req, res) => {
+    if (!req.body.token) {
+        return res.status(200).json({
+            error: true,
+            message: 'User token required.'
+        })
+    }
+
+    verifyUserToken(req.body.token, (item) => {
+        if ((!item) || (!item.isValid)) {
+            return res.status(200).json({
+                error: true,
+                message: 'User session expired. Please log in again to proceed. token err'
+            })
+        } else {
+            employeeModel.find({emplinemanagerid: item.internalID}, {_id: true}, (empErr, empArr) => {
+                if(empErr) {
+                    return res.status(200).json({
+                        error: true,
+                        message: 'An unexpected error occurred. Please try again later. employee find err'
+                    })
+                } else if(empArr.length<=0) {
+                    return res.status(200).json({
+                        error: false,
+                        message: 'No underlings found.',
+                        data: []
+                    })
+                } else {
+                    let list = empArr.map(item => {return String(item._id)})
+                    userModel.find({"isEmployee.employeeID": {$in: list}}, (usersErr, userArr) => {
+                        if(usersErr) {
+                            return res.status(200).json({
+                                error: true,
+                                message: 'An unexpected error occurred. Please try again later.',
+                            })
+                        } else if(userArr.length<=0) {
+                            return res.status(200).json({
+                                error: false,
+                                message: 'No underlings found.',
+                                data: []
+                            })
+                        } else {
+                            return res.status(200).json({
+                                error: false,
+                                message: 'Underlings found.',
+                                data: userArr
+                            })
+                        }
+                    })
+                }
+            })
+        }
+    })
+})
 module.exports = router
