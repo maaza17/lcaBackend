@@ -142,14 +142,14 @@ router.post('/updateProgress', (req, res) => {
     }
 
     verifyUserToken(req.body.token, (item) => {
-        
+
         if ((!item) || (!item.isValid)) {
             return res.status(200).json({
                 error: true,
                 message: 'User session expired. Please log in again to proceed.'
             })
         } else {
-            if (!req.body.enrollmentID || req.body.sectionIndex===null || req.body.lessonIndex===null) {
+            if (!req.body.enrollmentID || req.body.sectionIndex === null || req.body.lessonIndex === null) {
                 return res.status(200).json({
                     error: true,
                     message: 'Parameter(s) missing.'
@@ -162,7 +162,7 @@ router.post('/updateProgress', (req, res) => {
                         error: true,
                         message: 'An unexpected error occurred. Please try again later.'
                     })
-                } else {
+                } else if (doc.sectionIndex < req.body.sectionIndex || (doc.sectionIndex === req.body.sectionIndex && doc.lessonIndex < req.body.lessonIndex)) {
                     doc.sectionIndex = req.body.sectionIndex;
                     doc.lessonIndex = req.body.lessonIndex;
                     enrollmentModel.findOneAndUpdate({ _id: req.body.enrollmentID }, doc, { new: true }, (newErr, newDoc) => {
@@ -178,6 +178,12 @@ router.post('/updateProgress', (req, res) => {
                                 data: newDoc
                             })
                         }
+                    })
+                } else {
+                    return res.status(200).json({
+                        error: false,
+                        message: 'This lesson is already cleared.',
+                        data: doc
                     })
                 }
             })
