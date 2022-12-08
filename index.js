@@ -3,6 +3,8 @@ const mongoose = require('mongoose')
 require("dotenv").config();
 
 const app = express();
+var cors = require('cors');
+app.use(cors());
 
 const verifyGlobalToken = require('./routes/global')
 const homeHeadlineRoute = require('./routes/homeHeadline')
