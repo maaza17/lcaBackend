@@ -353,7 +353,6 @@ router.post('/selfNomination', (req, res) => {
             message: 'Login required.'
         })
     }
-
     verifyUserToken(req.body.token, (item) => {
         if ((!item) || (!item.isValid)) {
             return res.status(200).json({
@@ -361,10 +360,7 @@ router.post('/selfNomination', (req, res) => {
                 message: 'User session expired. Please log in again to proceed.'
             })
         } else {
-            console.log(item)
             trainingModel.findOne({ _id: req.body.trainingID }, (err, doc) => {
-                console.log(err)
-                console.log(doc)
                 if (err) {
                     return res.status(200).json({
                         error: true,
@@ -375,10 +371,15 @@ router.post('/selfNomination', (req, res) => {
                         userID: item.user_id,
                         name: item.name,
                         email: item.email,
-                        occupation: item.occupation,
                         isEmployee: item.isEmployee
                     }
-                    if (doc.participants.indexOf(obj) === -1) {
+                    let found = false;
+                    doc.participants.forEach((item) => {
+                        if (obj.userID && item.userID && obj.userID == item.userID) {
+                            found = true;
+                        }
+                    })
+                    if (!found) {
                         doc.participants.push(obj)
                         doc.save((err, saveDoc) => {
                             if (saveDoc) {
@@ -415,7 +416,6 @@ router.post('/nominateByManager', (req, res) => {
             message: 'Login required.'
         })
     }
-
     verifyUserToken(req.body.token, (item) => {
         if ((!item) || (!item.isValid)) {
             return res.status(200).json({
@@ -429,18 +429,48 @@ router.post('/nominateByManager', (req, res) => {
                     message: 'Required parameters are missing.'
                 })
             }
-
-            trainingModel.findOneAndUpdate({ _id: req.body.trainingID }, { participants: { $push: req.body.nominations } }, (err, doc) => {
+            trainingModel.findOne({ _id: req.body.trainingID }, (err, doc) => {
                 if (err) {
                     return res.status(200).json({
                         error: true,
                         message: 'An unexpected error occurred. Please try again later.'
                     })
                 } else {
-                    return res.status(200).json({
-                        error: false,
-                        message: 'Nominations successful.',
-                        data: doc
+                    let count = 0;
+                    for (var i = 0; i < req.body.nominations.length; i++) {
+                        let obj = {
+                            userID: req.body.nominations[i].user_id,
+                            name: req.body.nominations[i].name,
+                            email: req.body.nominations[i].email,
+                            isEmployee: req.body.nominations[i].isEmployee
+                        }
+                        let found = false;
+                        doc.participants.forEach((item) => {
+                            if (obj.userID && item.userID && obj.userID == item.userID) {
+                                found = true;
+                            }
+                        })
+                        if (!found) {
+                            doc.participants.push(obj)
+                            count++;
+                        }
+                    }
+                    doc.save((err, saveDoc) => {
+                        if (saveDoc) {
+                            return res.status(200).json({
+                                error: false,
+                                message: 'Nominations successful.',
+                                data: saveDoc,
+                                addCount: count,
+                                repeatCount: req.body.nominations.length - count
+                            })
+                        } else {
+                            return res.status(200).json({
+                                error: true,
+                                err: err,
+                                message: 'An unexpected error occurred. Please try again later.'
+                            })
+                        }
                     })
                 }
             })

@@ -133,12 +133,12 @@ router.post('/getUnderlings', (req, res) => {
                 } else if(docs.length <= 0){
                     return res.status(200).json({
                         error: false,
-                        message: 'This emplyee does not have any reportees.'
+                        message: 'This employee does not have any underlings.'
                     })
                 } else {
                     return res.status(200).json({
                         error: false,
-                        message: 'Found ' + docs.length + ' reportees for this employee.',
+                        message: 'Found ' + docs.length + ' underlings for this employee.',
                         data: docs
                     })
                 }

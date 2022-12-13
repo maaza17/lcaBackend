@@ -969,6 +969,7 @@ router.post('/getUnderlings', (req, res) => {
                 message: 'User session expired. Please log in again to proceed. token err'
             })
         } else {
+            console.log(item);
             employeeModel.find({emplinemanagerid: item.internalID}, {_id: true}, (empErr, empArr) => {
                 if(empErr) {
                     return res.status(200).json({
