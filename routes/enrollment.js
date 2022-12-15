@@ -4,6 +4,18 @@ const verifyAdminToken = require('../helpers/verifyAdminToken')
 const verifyUserToken = require('../helpers/verifyUserToken')
 const enrollmentModel = require('../models/Enrollement')
 const courseModel = require('../models/Course')
+const ObjectID = require('mongodb').ObjectID;
+
+router.post('/haris', (req, res) => {
+    verifyUserToken(req.body.token, (item) => {
+        enrollmentModel.find({ userId: item.user_id }, (err, docs) => {
+            return res.status(200).json({
+                docs: docs,
+            })
+        })
+    })
+
+})
 
 router.post('/enrollCourse', (req, res) => {
     if (!req.body.token) {
@@ -12,7 +24,6 @@ router.post('/enrollCourse', (req, res) => {
             message: 'User token is required to proceed.'
         })
     }
-
     verifyUserToken(req.body.token, (item) => {
         if ((!item) || (!item.isValid)) {
             return res.status(200).json({
@@ -27,10 +38,8 @@ router.post('/enrollCourse', (req, res) => {
                     message: 'Course id not provided.'
                 })
             }
-
-            enrollmentModel.findOne({ courseId: courseID, userId: item.user_id }, (findOneErr, findOneDoc) => {
-                if (!findOneDoc) {
-
+            enrollmentModel.find({ userId: item.user_id }, (enrolledCourseErr, enrolledCourseDocs) => {
+                if (!enrolledCourseErr) {
                     courseModel.findOne({ _id: courseID, status: 'Listed' }, (courseErr, course) => {
                         if (courseErr) {
                             return res.status(200).json({
@@ -43,46 +52,81 @@ router.post('/enrollCourse', (req, res) => {
                                 message: 'Attempt to enroll in an invalid course.'
                             })
                         } else {
-                            // let content = []
-                            // course.courseContent.forEach(section => {
-                            //     let tempSection = { _id: section._id, sectionTitle: section.sectionTitle, sectionAbstract: section.sectionAbstract, sectionLessons: [] }
-                            //     section.sectionLessons.forEach(lesson => {
-                            //         let tempLesson = {
-                            //             _id: lesson._id, lessonNumber: lesson.lessonNumber, lessonName: lesson.lessonName,
-                            //             lessonVideo: lesson.lessonVideo, lessonThumbnail: lesson.lessonThumbnail,
-                            //             lessonQuiz: lesson.lessonQuiz, completed: false
-                            //         }
-                            //         tempSection.sectionLessons.push(tempLesson)
-                            //     })
-                            //     content.push(tempSection)
-                            // })
+                            courseComplete = false;
+                            courseProcess = false;
+                            let temp = [];
+                            for (var i = 0; i < enrolledCourseDocs.length; i++) {
+                                if (enrolledCourseDocs[i].courseId == courseID && !enrolledCourseDocs[i].completed) {
+                                    courseProcess = true;
+                                    break;
 
-                            let newEnrollment = new enrollmentModel({
-                                courseId: courseID,
-                                userId: item.user_id,
-                            })
+                                } else if (enrolledCourseDocs[i].courseId == courseID && enrolledCourseDocs[i].completed) {
+                                    courseComplete = true;
+                                    break;
+                                }
+                                course.prerequisites.forEach((prereq) => {
+                                    if (enrolledCourseDocs[i].courseId.toString() == prereq._id.toString()) {
+                                        temp.push(enrolledCourseDocs[i]);
+                                    }
+                                })
+                            }
 
-                            newEnrollment.save((saveErr, saveDoc) => {
-                                if (saveErr) {
-                                    console.log(saveErr)
-                                    return res.status(200).json({
-                                        error: true,
-                                        message: 'An unexpected error occurred. Please try again later.'
-                                    })
-                                } else {
-                                    return res.status(200).json({
-                                        error: false,
-                                        message: 'Enrollment successful.',
-                                        data: saveDoc
+                            if (courseProcess) {
+                                return res.status(200).json({
+                                    error: true,
+                                    message: 'You are already enrolled in this course.'
+                                })
+                            } else if (courseComplete) {
+                                return res.status(200).json({
+                                    error: true,
+                                    message: 'You have already completed this course. You can review it in your courses page'
+                                })
+                            } else {
+                                let incompleteReqs = false;
+                                if (temp.length < course.prerequisites.length) incompleteReqs = true;
+                                else {
+                                    temp.forEach((mycourse) => {
+                                        course.prerequisites.forEach((prereq) => {
+                                            if (mycourse.courseId.toString() == prereq._id.toString() && !mycourse.completed){
+                                                incompleteReqs = true;
+                                            }
+                                        })
                                     })
                                 }
-                            })
+                                if (incompleteReqs) {
+                                    return res.status(200).json({
+                                        error: true,
+                                        message: 'You have not completed the required pre-requisites for this course.'
+                                    })
+                                } else {
+                                    let newEnrollment = new enrollmentModel({
+                                        courseId: courseID,
+                                        userId: item.user_id,
+                                    })
+                                    newEnrollment.save((saveErr, saveDoc) => {
+                                        if (saveErr) {
+                                            console.log(saveErr)
+                                            return res.status(200).json({
+                                                error: true,
+                                                message: 'An unexpected error occurred. Please try again later.'
+                                            })
+                                        } else {
+                                            return res.status(200).json({
+                                                error: false,
+                                                message: 'Enrollment successful.',
+                                                data: saveDoc
+                                            })
+                                        }
+                                    })
+                                }
+                            }
                         }
                     })
                 } else {
                     return res.status(200).json({
                         error: true,
-                        message: 'You have already completed or are enrolled for this course.'
+                        err: enrolledCourseErr,
+                        message: 'An unexpected error occurred. Please try again later.'
                     })
                 }
             })
@@ -142,14 +186,14 @@ router.post('/updateProgress', (req, res) => {
     }
 
     verifyUserToken(req.body.token, (item) => {
-        
+
         if ((!item) || (!item.isValid)) {
             return res.status(200).json({
                 error: true,
                 message: 'User session expired. Please log in again to proceed.'
             })
         } else {
-            if (!req.body.enrollmentID || req.body.sectionIndex===null || req.body.lessonIndex===null) {
+            if (!req.body.enrollmentID || req.body.sectionIndex === null || req.body.lessonIndex === null) {
                 return res.status(200).json({
                     error: true,
                     message: 'Parameter(s) missing.'
@@ -162,7 +206,7 @@ router.post('/updateProgress', (req, res) => {
                         error: true,
                         message: 'An unexpected error occurred. Please try again later.'
                     })
-                } else {
+                } else if (doc.sectionIndex < req.body.sectionIndex || (doc.sectionIndex === req.body.sectionIndex && doc.lessonIndex < req.body.lessonIndex)) {
                     doc.sectionIndex = req.body.sectionIndex;
                     doc.lessonIndex = req.body.lessonIndex;
                     enrollmentModel.findOneAndUpdate({ _id: req.body.enrollmentID }, doc, { new: true }, (newErr, newDoc) => {
@@ -178,6 +222,12 @@ router.post('/updateProgress', (req, res) => {
                                 data: newDoc
                             })
                         }
+                    })
+                } else {
+                    return res.status(200).json({
+                        error: false,
+                        message: 'This lesson is already cleared.',
+                        data: doc
                     })
                 }
             })
