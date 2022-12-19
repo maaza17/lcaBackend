@@ -984,7 +984,10 @@ router.post('/getUnderlings', (req, res) => {
                     })
                 } else {
                     let list = empArr.map(item => {return String(item._id)})
+                    console.log(list)
                     userModel.find({"isEmployee.employeeID": {$in: list}}, (usersErr, userArr) => {
+                        console.log(usersErr)
+                        console.log(userArr)
                         if(usersErr) {
                             return res.status(200).json({
                                 error: true,
