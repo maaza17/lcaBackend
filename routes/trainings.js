@@ -2,7 +2,7 @@ const router = require('express').Router();
 const trainingModel = require('../models/Trainings');
 const verifyAdminToken = require('../helpers/verifyAdminToken');
 const verifyUserToken = require('../helpers/verifyUserToken');
-// create training registration email - for both self and manager nomination and import & use here
+const { selfNominationEmail, managerNominationEmail } = require('../helpers/nodemailer')
 
 router.post('/editTraining', (req, res) => {
 
@@ -381,12 +381,23 @@ router.post('/selfNomination', (req, res) => {
                     })
                     if (!found) {
                         doc.participants.push(obj)
+                        doc.slotsLeft = doc.slotsLeft - 1;
                         doc.save((err, saveDoc) => {
                             if (saveDoc) {
-                                return res.status(200).json({
-                                    error: false,
-                                    message: 'Self nomination successful.',
-                                    data: saveDoc
+                                selfNominationEmail({ name: item.name, email: item.email, training: saveDoc }, (mailErr, mailInfo) => {
+                                    if (mailErr) {
+                                        return res.status(200).json({
+                                            error: false,
+                                            message: 'An unexpected error occurred sending out the email but your training session has been booked successfully.',
+                                            error_message: mailErr
+                                        })
+                                    } else {
+                                        return res.status(200).json({
+                                            error: false,
+                                            message: 'Self Nomination successful. Check email for invite.',
+                                            data: saveDoc
+                                        })
+                                    }
                                 })
                             } else {
                                 return res.status(200).json({
@@ -399,7 +410,7 @@ router.post('/selfNomination', (req, res) => {
                     } else {
                         return res.status(200).json({
                             error: false,
-                            message: 'Already nominated for this training.'
+                            message: 'You are already nominated for this training.'
                         })
                     }
                 }
@@ -455,14 +466,25 @@ router.post('/nominateByManager', (req, res) => {
                             count++;
                         }
                     }
+                    doc.slotsLeft = doc.slotsLeft - addCount;
                     doc.save((err, saveDoc) => {
                         if (saveDoc) {
-                            return res.status(200).json({
-                                error: false,
-                                message: 'Nominations successful.',
-                                data: saveDoc,
-                                addCount: count,
-                                repeatCount: req.body.nominations.length - count
+                            managerNominationEmail({ name: item.name, email: item.email, training: saveDoc, manager: item.name }, (mailErr, mailInfo) => {
+                                if (mailErr) {
+                                    return res.status(200).json({
+                                        error: false,
+                                        message: 'An unexpected error occurred sending out the email but your training session has been booked successfully.',
+                                        error_message: mailErr
+                                    })
+                                } else {
+                                    return res.status(200).json({
+                                        error: false,
+                                        message: 'Nominations successful.',
+                                        data: saveDoc,
+                                        addCount: count,
+                                        repeatCount: req.body.nominations.length - count
+                                    })
+                                }
                             })
                         } else {
                             return res.status(200).json({

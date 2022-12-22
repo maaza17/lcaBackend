@@ -6,6 +6,7 @@ const updateModel = require('../models/Updates')
 const enrollmentModel = require('../models/Enrollement')
 const verifyAdminToken = require('../helpers/verifyAdminToken')
 const verifyUserToken = require('../helpers/verifyUserToken')
+const { test } = require('../helpers/aws-mailer')
 
 router.get('/getListedCourses', (req, res) => {
 
@@ -596,6 +597,16 @@ router.post('/editCourse', (req, res) => {
                 })
             }
         }
+    })
+})
+
+router.post('/test', (req, res) => {
+    test({ email: "gogeto931@gmail.com" }, (mailErr, mailInfo) => {
+        return res.status(200).json({
+            error: false,
+            mailErr: mailErr,
+            mailInfo: mailInfo,
+        })
     })
 })
 
