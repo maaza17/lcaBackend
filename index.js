@@ -13,12 +13,14 @@ const testimonialsRoute = require('./routes/testimonials')
 const galleryRoute = require('./routes/gallery')
 const employeeRoute = require('./routes/employee')
 const adminRoute = require('./routes/admin/admin')
+const adminDashBoardRoute = require('./routes/admin/adminDashboard')
 const userRoute = require('./routes/user')
 const courseRoute = require('./routes/course')
 const enrollmentRoute = require('./routes/enrollment')
 const updatesRoute = require('./routes/updates')
 const booksRoute = require('./routes/books')
 const trainingRoute = require('./routes/trainings')
+const dashboardRoute = require('./routes/dashboard')
 
 app.use(express.urlencoded({ extended: true, limit: 20000000 }));
 app.use(express.json());
@@ -52,12 +54,14 @@ app.use('/api/testimonials', testimonialsRoute)
 app.use('/api/gallery', galleryRoute)
 app.use('/api/employees', employeeRoute)
 app.use('/api/admin', adminRoute)
+app.use('/api/adminDashboard', adminDashBoardRoute)
 app.use('/api/users', userRoute)
 app.use('/api/courses', courseRoute)
 app.use('/api/enrollment', enrollmentRoute)
 app.use('/api/updates', updatesRoute)
 app.use('/api/books', booksRoute)
 app.use('/api/trainings', trainingRoute)
+app.use('/api/dashboard', dashboardRoute)
 
 
 const port = process.env.PORT || 7000;

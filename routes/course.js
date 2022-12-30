@@ -6,6 +6,7 @@ const updateModel = require('../models/Updates')
 const enrollmentModel = require('../models/Enrollement')
 const verifyAdminToken = require('../helpers/verifyAdminToken')
 const verifyUserToken = require('../helpers/verifyUserToken')
+const { test } = require('../helpers/aws-mailer')
 
 router.get('/getListedCourses', (req, res) => {
 
@@ -452,7 +453,6 @@ router.post('/checkAvailability', (req, res) => {
             message: 'User token is required to proceed.'
         })
     }
-
     verifyUserToken(req.body.token, (item) => {
         if ((!item) || (!item.isValid)) {
             return res.status(200).json({
@@ -460,8 +460,9 @@ router.post('/checkAvailability', (req, res) => {
                 message: 'User session expired. Please log in again to proceed.'
             })
         } else {
+            console.log(item)
             if (item.isEmployee.isTrue) {
-                courseModel.find({ "availability.forEmployees": true, "availability.employeeList": { $elemMatch: { employeeID: item.isEmployee.employeeID } } }, { _id: true }, (err, docs) => {
+                courseModel.find({ "availability.forEmployees": true }, (err, docs) => {
                     if (err) {
                         console.log(err.message)
                         return res.status(200).json({
@@ -469,10 +470,18 @@ router.post('/checkAvailability', (req, res) => {
                             message: 'An unexpected error occurred. Please try again later.'
                         })
                     } else {
+                        out = [];
+                        docs.map((course) => {
+                            course.availability.employeeList.map((empObj) => {
+                                if (empObj.employeeID == item.isEmployee.employeeID) {
+                                    out.push({ _id: course._id })
+                                }
+                            })
+                        })
                         return res.status(200).json({
                             error: false,
                             message: 'Available courses found.',
-                            data: docs
+                            data: out
                         })
                     }
                 })
@@ -588,6 +597,16 @@ router.post('/editCourse', (req, res) => {
                 })
             }
         }
+    })
+})
+
+router.post('/test', (req, res) => {
+    test({ email: "gogeto931@gmail.com" }, (mailErr, mailInfo) => {
+        return res.status(200).json({
+            error: false,
+            mailErr: mailErr,
+            mailInfo: mailInfo,
+        })
     })
 })
 
