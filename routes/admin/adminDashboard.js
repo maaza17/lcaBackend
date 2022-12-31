@@ -171,8 +171,19 @@ router.post("/getTrainingCountsByMonth", async (req, res) => {
       });
     } else {
       const trainingCountByMonth = await trainingModel.aggregate([
-        {$group: { _id: { year: { $year: "$startDate" }, month: { $month: "$startDate" } },
-        total_count_month: { $sum: 1 }}}])
+        {
+          $group: {
+            _id: {
+              year: { $year: "$startDate" },
+              month: { $month: "$startDate" },
+            },
+            total_count_month: { $sum: 1 },
+          },
+        },
+        {
+          $sort: { "_id": 1 }
+        }
+      ]);
 
       return res.status(200).json({
         error: false,
