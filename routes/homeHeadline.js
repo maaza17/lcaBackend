@@ -57,7 +57,7 @@ router.post('/changeHeadline', (req, res) => {
                 } else {
                     return res.status(200).json({
                         error: false,
-                        message: 'Headline changed successfully new.',
+                        message: 'Headline changed successfully.',
                         data: doc
                     })
                 }
