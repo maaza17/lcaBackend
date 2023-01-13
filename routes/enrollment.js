@@ -4,17 +4,47 @@ const verifyAdminToken = require('../helpers/verifyAdminToken')
 const verifyUserToken = require('../helpers/verifyUserToken')
 const enrollmentModel = require('../models/Enrollement')
 const courseModel = require('../models/Course')
-const ObjectID = require('mongodb').ObjectID;
+const userModel = require('../models/User')
+const bcrypt = require('bcryptjs')
+
 
 router.post('/haris', (req, res) => {
-    verifyUserToken(req.body.token, (item) => {
-        enrollmentModel.find({ userId: item.user_id }, (err, docs) => {
-            return res.status(200).json({
-                docs: docs,
-            })
+    userModel.findOne({ _id: "633ec0357f2160b220c36acb" }, (err, doc) => {
+        bcrypt.genSalt(10, (saltErr, salt) => {
+            if (saltErr) {
+                return res.status(200).json({
+                    error: true,
+                    message: 'Unexpected error occurred. Please try again later.'
+                })
+            } else {
+                bcrypt.hash("abc123", salt, (hashErr, hash) => {
+                    if (hashErr) {
+                        return res.status(200).json({
+                            error: true,
+                            message: 'Unexpected error occurred. Please try again later.'
+                        })
+                    } else {
+                        doc.password = hash
+                        doc.save((saveErr, saveDoc) => {
+                            if (saveErr) {
+                                return res.status(200).json({
+                                    error: true,
+                                    message: 'An Unexpected error occurred. Please try again later.'
+                                })
+                            } else {
+                                // send password reset email here
+                                return res.status(200).json({
+                                    error: false,
+                                    message: 'Password reset successfully.',
+                                    data: saveDoc
+                                })
+                            }
+                        })
+                    }
+                })
+            }
         })
     })
-
 })
 
 router.post('/enrollCourse', (req, res) => {
@@ -87,7 +117,7 @@ router.post('/enrollCourse', (req, res) => {
                                 else {
                                     temp.forEach((mycourse) => {
                                         course.prerequisites.forEach((prereq) => {
-                                            if (mycourse.courseId.toString() == prereq._id.toString() && !mycourse.completed){
+                                            if (mycourse.courseId.toString() == prereq._id.toString() && !mycourse.completed) {
                                                 incompleteReqs = true;
                                             }
                                         })

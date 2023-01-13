@@ -19,7 +19,7 @@ const enrollmentSchema = new mongoose.Schema({
     maxScore: {
         type: Number,
         required: false,
-        default: 0
+        default: 1
     },
     sectionIndex: {
         type: Number,
