@@ -83,40 +83,6 @@ router.post("/getCounts", (req, res) => {
     });
 });
 
-router.post("/getMyCourses2", (req, res) => {
-    if (!req.body.token) {
-        return res.status(200).json({
-            error: true,
-            message: "Token is required to proceed.",
-        });
-    }
-
-    verifyUserToken(req.body.token, (item) => {
-        const isValid = item.isValid;
-        const user_id = item.user_id;
-        if (!isValid) {
-            return res.status(200).json({
-                error: true,
-                message: "Access denied. Invalid token. Please login again.",
-            });
-        } else {
-            let courseIDs = [];
-            enrollmentModel.find({ userId: user_id }).sort({ registrationDate: -1 })
-                .then((enrollmentDocs) => {
-                    for (var i = 0; i < enrollmentDocs.length; i++) {
-                        courseIDs.push(enrollmentDocs[i].courseId)
-                    }
-                    courseModel.find({ _id: { $in: courseIDs } }).then((courseDocs) => {
-                        return res.status(200).json({
-                            courses: courseDocs,
-                            enrolls: enrollmentDocs
-                        })
-                    })
-                })
-        }
-    })
-})
-
 router.post("/getMyCourses", (req, res) => {
     if (!req.body.token) {
         return res.status(200).json({
