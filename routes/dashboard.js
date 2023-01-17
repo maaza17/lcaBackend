@@ -157,9 +157,9 @@ router.post("/getMyCourses", (req, res) => {
                                         }
                                     }
                                     courses.push({
-                                        percentage: enrollmentDocs[i].score / enrollmentDocs[i].maxScore,
+                                        percentage: (enrollmentDocs[i].score / enrollmentDocs[i].maxScore) * 100,
                                         courseData: courseObj,
-                                        progress: sum / courseObj.courseStats.countLessons,
+                                        progress: (sum / courseObj.courseStats.countLessons) * 100,
                                         text: "From Recent Courses Enrolled"
                                     })
                                 }
@@ -186,9 +186,9 @@ router.post("/getMyCourses", (req, res) => {
                                         }
                                     }
                                     courses.push({
-                                        percentage: enrollmentDocs[i].score / enrollmentDocs[i].maxScore,
+                                        percentage: (enrollmentDocs[i].score / enrollmentDocs[i].maxScore) * 100,
                                         courseData: courseObj,
-                                        progress: sum / courseObj.courseStats.countLessons,
+                                        progress: (sum / courseObj.courseStats.countLessons) * 100,
                                         text: "From Recent Courses Enrolled"
                                     })
                                 }
