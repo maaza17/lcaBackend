@@ -34,15 +34,15 @@ router.post("/getCounts", (req, res) => {
             let openTo = {};
             enrollmentModel.find({ userId: user_id })
                 .then((enrollmentDocs) => {
-                    let score, total = 0;
+                    let score = 0;
+                    let total = 0;
                     coursesCount = enrollmentDocs.length
-
                     enrollmentDocs.forEach((item) => {
-                        score = score + item.score;
-                        total = total + item.maxScore;
+                        score = score + parseInt(item.score);
+                        total = total + parseInt(item.maxScore);
                     })
                     if (total === 0) overallScore = 0;
-                    else overallScore = score / total;
+                    else overallScore = ((score / total)*100).toFixed(1);
 
                     if (item.isEmployee.isTrue) openTo = { $in: ['internal', 'public'] }
                     else openTo = { $in: ['external', 'public'] }
