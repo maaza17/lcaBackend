@@ -83,6 +83,40 @@ router.post("/getCounts", (req, res) => {
     });
 });
 
+router.post("/getMyCourses2", (req, res) => {
+    if (!req.body.token) {
+        return res.status(200).json({
+            error: true,
+            message: "Token is required to proceed.",
+        });
+    }
+
+    verifyUserToken(req.body.token, (item) => {
+        const isValid = item.isValid;
+        const user_id = item.user_id;
+        if (!isValid) {
+            return res.status(200).json({
+                error: true,
+                message: "Access denied. Invalid token. Please login again.",
+            });
+        } else {
+            let courseIDs = [];
+            enrollmentModel.find({ userId: user_id }).sort({ registrationDate: -1 })
+                .then((enrollmentDocs) => {
+                    for (var i = 0; i < enrollmentDocs.length; i++) {
+                        courseIDs.push(enrollmentDocs[i].courseId)
+                    }
+                    courseModel.find({ _id: { $in: courseIDs } }).then((courseDocs) => {
+                        return res.status(200).json({
+                            courses: courseDocs,
+                            enrolls: enrollmentDocs
+                        })
+                    })
+                })
+        }
+    })
+})
+
 router.post("/getMyCourses", (req, res) => {
     if (!req.body.token) {
         return res.status(200).json({
@@ -104,6 +138,7 @@ router.post("/getMyCourses", (req, res) => {
             let courseIDs = [];
             enrollmentModel.find({ userId: user_id, completed: false }).sort({ registrationDate: -1 })
                 .then((enrollmentDocs) => {
+                    // console.log(enrollmentDocs)
                     if (enrollmentDocs && enrollmentDocs.length >= 5) {
                         console.log(enrollmentDocs);
                         // console.log('here');
@@ -141,8 +176,9 @@ router.post("/getMyCourses", (req, res) => {
                         }
                         courseModel.find({ _id: { $in: courseIDs } }).then((courseDocs) => {
                             for (var i = 0; i < enrollmentDocs.length; i++) {
-                                let courseObj = courseDocs.find(obj => enrollmentDocs[0].courseId.equals(courseDocs[0]._id));
+                                let courseObj = courseDocs.find(obj => enrollmentDocs[i].courseId.equals(obj._id));
                                 if (courseObj) {
+                                    console.log(courseObj)
                                     let sum = 0;
                                     for (var j = 0; j < enrollmentDocs[i].sectionIndex; j++) {
                                         for (var k = 0; k < enrollmentDocs[i].lessonIndex; k++) {
@@ -158,7 +194,7 @@ router.post("/getMyCourses", (req, res) => {
                                 }
                             }
                             courseModel.find({ status: "Listed" }).sort({ dateAdded: -1 }).then((course_docs) => {
-                                console.log(course_docs.length);
+                                // console.log(course_docs.length);
                                 let limit = 5 - courses.length
                                 for (var x = 0; x < limit; x++) {
                                     courses.push({
