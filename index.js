@@ -21,6 +21,7 @@ const updatesRoute = require('./routes/updates')
 const booksRoute = require('./routes/books')
 const trainingRoute = require('./routes/trainings')
 const dashboardRoute = require('./routes/dashboard')
+const variableRoute = require('./routes/variable')
 
 app.use(express.urlencoded({ extended: true, limit: 20000000 }));
 app.use(express.json());
@@ -62,6 +63,7 @@ app.use('/api/updates', updatesRoute)
 app.use('/api/books', booksRoute)
 app.use('/api/trainings', trainingRoute)
 app.use('/api/dashboard', dashboardRoute)
+app.use('/api/variable', variableRoute)
 
 
 const port = process.env.PORT || 7000;
