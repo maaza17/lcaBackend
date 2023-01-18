@@ -239,14 +239,14 @@ router.get('/getAllTrainings', (req, res) => {
   })
 })
 
-router.post('/getSingeTrainings', (req, res) => {
+router.post('/getSingleTrainings', (req, res) => {
   if (!req.body.trainingID) {
     return res.status(200).json({
       error: true,
       message: 'Course ID is required.'
     })
   }
-  trainingModel.find({ _id: req.body.trainingID }, (err, trainings) => {
+  trainingModel.findOne({ _id: req.body.trainingID }, (err, trainings) => {
     if (err) {
       return res.status(200).json({
         error: true,
