@@ -217,7 +217,7 @@ router.post('/addTestimonial', (req, res) => {
                 message: 'Access denied. Limited for admin(s).'
             })
         } else {
-            let {testimonial, authorName, authorImage} = req.body
+            let {testimonial, authorName,authorDesignation, authorImage} = req.body
             let newTestimonial = new testimonialModel({testimonial: testimonial, authorName: authorName,authorDesignation:authorDesignation, authorImage: authorImage})
             newTestimonial.save((err, doc) => {
                 if(err){
