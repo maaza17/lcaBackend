@@ -277,9 +277,13 @@ router.post("/getUnderlingStats", (req, res) => {
                                                             tempEnrolls.forEach((item, index) => {
                                                                 totalScore = totalScore + item.score;
                                                                 totalMaxScore = totalMaxScore + item.maxScore;
-                                                                courseList.push(courseDocs.find(subitem => subitem._id.equals(item.courseId)));
-                                                                scoreList.push({"score":item.score,"maxScore":item.maxScore});
-                                                                trainingList.push(trainingDocs.filter((trainItem) => { if (trainItem.participants.find(subitem => subitem.userID && item.userId && subitem.userID.equals(item.userId))) return trainItem; })[0])
+                                                                let temp = courseDocs.find(subitem => subitem._id.equals(item.courseId))
+                                                                if (temp) {
+                                                                    courseList.push(temp);
+                                                                    scoreList.push({ "score": item.score, "maxScore": item.maxScore });
+                                                                }
+                                                                temp = trainingDocs.filter((trainItem) => { if (trainItem.participants.find(subitem => subitem.userID && item.userId && subitem.userID.equals(item.userId))) return trainItem; })[0]
+                                                                if (temp) { trainingList.push(temp) }
                                                                 if (index === tempEnrolls.length - 1) recentEnrollment = courseDocs.find(subitem => subitem._id.equals(item.courseId))
                                                             })
                                                             final[index] = {
