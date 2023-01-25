@@ -42,7 +42,7 @@ router.post("/getCounts", (req, res) => {
                         total = total + parseInt(item.maxScore);
                     })
                     if (total === 0) overallScore = 0;
-                    else overallScore = ((score / total)*100).toFixed(1);
+                    else overallScore = ((score / total) * 100).toFixed(1);
 
                     if (item.isEmployee.isTrue) openTo = { $in: ['internal', 'public'] }
                     else openTo = { $in: ['external', 'public'] }
@@ -82,40 +82,6 @@ router.post("/getCounts", (req, res) => {
         }
     });
 });
-
-router.post("/getMyCourses2", (req, res) => {
-    if (!req.body.token) {
-        return res.status(200).json({
-            error: true,
-            message: "Token is required to proceed.",
-        });
-    }
-
-    verifyUserToken(req.body.token, (item) => {
-        const isValid = item.isValid;
-        const user_id = item.user_id;
-        if (!isValid) {
-            return res.status(200).json({
-                error: true,
-                message: "Access denied. Invalid token. Please login again.",
-            });
-        } else {
-            let courseIDs = [];
-            enrollmentModel.find({ userId: user_id }).sort({ registrationDate: -1 })
-                .then((enrollmentDocs) => {
-                    for (var i = 0; i < enrollmentDocs.length; i++) {
-                        courseIDs.push(enrollmentDocs[i].courseId)
-                    }
-                    courseModel.find({ _id: { $in: courseIDs } }).then((courseDocs) => {
-                        return res.status(200).json({
-                            courses: courseDocs,
-                            enrolls: enrollmentDocs
-                        })
-                    })
-                })
-        }
-    })
-})
 
 router.post("/getMyCourses", (req, res) => {
     if (!req.body.token) {
@@ -235,4 +201,150 @@ router.post("/getMyCourses", (req, res) => {
         }
     });
 });
+
+router.post("/getUnderlingStats", (req, res) => {
+    if (!req.body.token) {
+        return res.status(200).json({
+            error: true,
+            message: "Token is required to proceed.",
+        });
+    } else {
+        verifyUserToken(req.body.token, (item) => {
+            const isValid = item.isValid;
+            if (!isValid) {
+                return res.status(200).json({
+                    error: true,
+                    message: "Access denied. Invalid token. Please login again.",
+                });
+            } else {
+                courseModel.find({}, (courseErr, courseDocs) => {
+                    trainingModel.find({}, (trainingErr, trainingDocs) => {
+                        employeeModel.find({ emplinemanagerid: item.internalID }, (underErr, underDocs) => {
+                            if (underDocs) {
+                                if (underDocs.length > 0) {
+                                    let final = []
+                                    let underIDs = [];
+                                    underDocs.forEach((item) => {
+                                        underIDs.push(item._id);
+                                        final.push({
+                                            name: item.empname,
+                                            employeeID: item.empid,
+                                            mongoEmpId: item._id,
+                                            userId: null,
+                                            totalScore: 0,
+                                            totalMaxScore: 0,
+                                            recentEnrollment: "",
+                                            courseList: [],
+                                            trainingList: []
+                                        })
+                                    });
+                                    userModel.find({ "isEmployee.employeeID": { $in: underIDs } }, (userErr, userDocs) => {
+                                        if (userDocs) {
+                                            if (userDocs.length > 0) {
+                                                let userIDs = [];
+                                                // console.log(userDocs);
+                                                // console.log(final);
+                                                userDocs.forEach((item) => {
+                                                    userIDs.push(item._id);
+                                                    final.forEach((fItem, index) => {
+                                                        if (item.isEmployee.employeeID && fItem.mongoEmpId && fItem.mongoEmpId.equals(item.isEmployee.employeeID)) {
+                                                            final[index] = {
+                                                                name: final[index].name,
+                                                                mongoEmpId: final[index].mongoEmpId,
+                                                                employeeID: final[index].employeeID,
+                                                                userId: item._id,
+                                                                totalScore: 0,
+                                                                totalMaxScore: 0,
+                                                                recentEnrollment: "",
+                                                                courseList: [],
+                                                                trainingList: []
+                                                            }
+                                                        }
+                                                    })
+                                                });
+                                                // console.log(userIDs)
+                                                enrollmentModel.find({ "userId": { $in: userIDs } }).sort({ registrationDate: 1 }).then((enrollDocs) => {
+                                                    // console.log(enrollDocs)
+                                                    if (enrollDocs.length > 0) {
+                                                        final.forEach((fItem, index) => {
+                                                            let tempEnrolls = enrollDocs.filter(item => item.userId.equals(fItem.userId))
+                                                            let totalScore = 0;
+                                                            let totalMaxScore = 0;
+                                                            let courseList = [];
+                                                            let scoreList = [];
+                                                            let trainingList = [];
+                                                            let recentEnrollment = null;
+                                                            tempEnrolls.forEach((item, index) => {
+                                                                totalScore = totalScore + item.score;
+                                                                totalMaxScore = totalMaxScore + item.maxScore;
+                                                                courseList.push(courseDocs.find(subitem => subitem._id.equals(item.courseId)));
+                                                                scoreList.push({"score":item.score,"maxScore":item.maxScore});
+                                                                trainingList.push(trainingDocs.filter((trainItem) => { if (trainItem.participants.find(subitem => subitem.userID && item.userId && subitem.userID.equals(item.userId))) return trainItem; })[0])
+                                                                if (index === tempEnrolls.length - 1) recentEnrollment = courseDocs.find(subitem => subitem._id.equals(item.courseId))
+                                                            })
+                                                            final[index] = {
+                                                                name: final[index].name,
+                                                                mongoEmpId: final[index].mongoEmpId,
+                                                                employeeID: final[index].employeeID,
+                                                                userId: final[index].userId,
+                                                                totalScore: totalScore,
+                                                                totalMaxScore: totalMaxScore,
+                                                                recentEnrollment: recentEnrollment,
+                                                                courseList: courseList,
+                                                                scoreList: scoreList,
+                                                                trainingList: trainingList
+                                                            }
+                                                        })
+                                                        return res.status(200).json({
+                                                            error: false,
+                                                            data: final,
+                                                        });
+                                                    }
+                                                    else return res.status(200).json({
+                                                        error: false,
+                                                        data: final,
+                                                        message: "No enrollments found.",
+                                                    });
+
+                                                }).catch((err) => {
+                                                    return res.status(200).json({
+                                                        err: err,
+                                                        error: true,
+                                                        message: "An unexpected error occurred. Please try again later 1",
+                                                    });
+                                                })
+                                            }
+                                            else return res.status(200).json({
+                                                error: false,
+                                                data: final,
+                                                message: "No users found.",
+                                            });
+                                        }
+                                        else return res.status(200).json({
+                                            err: userErr,
+                                            error: true,
+                                            message: "An unexpected error occurred. Please try again later 2",
+                                        });
+                                    })
+                                }
+                                else return res.status(200).json({
+                                    error: false,
+                                    data: [],
+                                    message: "No underlings found.",
+                                });
+                            }
+                            else return res.status(200).json({
+                                err: underErr,
+                                error: true,
+                                message: "An unexpected error occurred. Please try again later 3",
+                            });
+                        })
+                    })
+                })
+            }
+        });
+    }
+});
+
+
 module.exports = router
