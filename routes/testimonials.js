@@ -68,14 +68,14 @@ router.post('/editTestimonial', (req, res) => {
                 message: 'Access denied. Limited for admin(s).'
             })
         } else {
-            let {_id, testimonial, authorName, authorImage, rating} = req.body
+            let {_id, testimonial, authorName,authorDesignation, authorImage} = req.body
             if(!_id){
                 return res.status(200).json({
                     error: true,
                     message: "Testimonial object id is required."
                 })
             }
-            testimonialModel.findOneAndUpdate({_id: _id}, {testimonial: testimonial, authorName: authorName, authorImage: authorImage, rating: rating}, {new: true}, (err, doc) => {
+            testimonialModel.findOneAndUpdate({_id: _id}, {testimonial: testimonial, authorName: authorName,authorDesignation:authorDesignation, authorImage: authorImage}, {new: true}, (err, doc) => {
                 if(err){
                     return res.status(200).json({
                         error: true,
@@ -217,8 +217,8 @@ router.post('/addTestimonial', (req, res) => {
                 message: 'Access denied. Limited for admin(s).'
             })
         } else {
-            let {testimonial, authorName, authorImage, rating} = req.body
-            let newTestimonial = new testimonialModel({testimonial: testimonial, authorName: authorName, authorImage: authorImage, rating: rating})
+            let {testimonial, authorName,authorDesignation, authorImage} = req.body
+            let newTestimonial = new testimonialModel({testimonial: testimonial, authorName: authorName,authorDesignation:authorDesignation, authorImage: authorImage})
             newTestimonial.save((err, doc) => {
                 if(err){
                     return res.status(200).json({
