@@ -9,12 +9,12 @@ const testimonialSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    authorImage: {
+    authorDesignation: {
         type: String,
         required: true
     },
-    rating: {
-        type: Number,
+    authorImage: {
+        type: String,
         required: true
     },
     isDeleted: {
