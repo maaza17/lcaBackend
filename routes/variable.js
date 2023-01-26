@@ -4,6 +4,12 @@ const jwt = require("jsonwebtoken")
 const variableModel = require('../models/Variable')
 const verifyAdminToken = require('../helpers/verifyAdminToken')
 
+const userModel = require("../models/User");
+const courseModel = require("../models/Course");
+const trainingModel = require("../models/Trainings");
+const enrollmentModel = require("../models/Enrollement");
+const employeeModel = require("../models/Employee");
+
 router.post('/newVariable', (req, res) => {
     variableModel.findOne({ name: req.body.name }, (err, doc) => {
         if (doc) {
@@ -108,5 +114,39 @@ router.post('/changeVariable', (req, res) => {
         }
     })
 })
+
+router.get('/getVariableStatistics', (req, res) => {
+    let locationsCovered = 0;
+    let totalParticipants = 0;
+    let totalTrainingHours = 0;
+    let numberOfTrainings = 0;
+    trainingModel.find({}, (err, docs) => {
+        if (docs) {
+            let allLocs = [];
+            docs.forEach((item) => {
+                if (allLocs.indexOf(item.location) === -1) allLocs.push(item.location);
+                totalParticipants = totalParticipants + item.participants.length;
+                var diff = (item.startDate.getTime() - item.endDate.getTime()) / 1000;
+                diff /= (60 * 60);
+                totalTrainingHours = totalTrainingHours + Math.abs(Math.round(diff));
+            })
+            numberOfTrainings = docs.length;
+            locationsCovered = allLocs.length;
+            return res.status(200).json({
+                error: false,
+                locationsCovered: locationsCovered,
+                totalParticipants: totalParticipants,
+                totalTrainingHours: totalTrainingHours,
+                numberOfTrainings: numberOfTrainings,
+                message: "Here you go good sir"
+            })
+        } else return res.status(200).json({
+            error: true,
+            err: err,
+            message: "An unexpected error occurred. Please try again later"
+        })
+    })
+})
+
 
 module.exports = router
