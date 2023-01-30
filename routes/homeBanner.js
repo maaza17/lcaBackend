@@ -56,7 +56,7 @@ router.post('/changeBanner', (req, res) => {
                 } else {
                     return res.status(200).json({
                         error: false,
-                        message: 'Baner changed successfully.',
+                        message: 'Banner changed successfully.',
                         data: doc
                     })
                 }
@@ -107,7 +107,7 @@ router.post('/changeHomeVideo', (req, res) => {
             })
         } else {
             let { videoLink } = req.body
-            homeBannerModel.findOneAndUpdate({ mediaType: 'home_video' }, { bannerLink: videoLink, altText: "", lastModified: Date.now() }, { new: true }, (err, doc) => {
+            homeBannerModel.findOneAndUpdate({ mediaType: 'home_video' }, { bannerLink: videoLink, altText: "", lastModified: Date.now() }, { new: true, returnNewDocument: true }, (err, doc) => {
                 if (err) {
                     return res.status(200).json({
                         error: true,
