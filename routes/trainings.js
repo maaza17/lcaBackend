@@ -524,7 +524,7 @@ router.post('/nominateByManager', (req, res) => {
               count++
             }
           }
-          doc.slotsLeft = doc.slotsLeft - addCount
+          doc.slotsLeft = doc.slotsLeft - count
           doc.save((err, saveDoc) => {
             if (saveDoc) {
               managerNominationEmail(
