@@ -4,8 +4,10 @@ const verifyAdminToken = require('../helpers/verifyAdminToken')
 const verifyUserToken = require('../helpers/verifyUserToken')
 const {
   selfNominationEmail,
-  managerNominationEmail
 } = require('../helpers/nodemailer')
+const {
+  managerNominationEmail
+} = require('../helpers/aws-mailer')
 
 router.post('/editTraining', (req, res) => {
   if (!req.body.token) {
@@ -506,6 +508,7 @@ router.post('/nominateByManager', (req, res) => {
           })
         } else {
           let count = 0
+          let newUsers = [];
           for (var i = 0; i < req.body.nominations.length; i++) {
             let obj = {
               userID: req.body.nominations[i].user_id,
@@ -521,38 +524,49 @@ router.post('/nominateByManager', (req, res) => {
             })
             if (!found) {
               doc.participants.push(obj)
+              newUsers.push(obj.email);
               count++
             }
           }
           doc.slotsLeft = doc.slotsLeft - count
           doc.save((err, saveDoc) => {
             if (saveDoc) {
-              managerNominationEmail(
-                {
-                  name: item.name,
-                  email: item.email,
-                  training: saveDoc,
-                  manager: item.name
-                },
-                (mailErr, mailInfo) => {
-                  if (mailErr) {
-                    return res.status(200).json({
-                      error: false,
-                      message:
-                        'An unexpected error occurred sending out the email but your training session has been booked successfully.',
-                      error_message: mailErr
-                    })
-                  } else {
-                    return res.status(200).json({
-                      error: false,
-                      message: 'Nominations successful.',
-                      data: saveDoc,
-                      addCount: count,
-                      repeatCount: req.body.nominations.length - count
-                    })
+              if (newUsers.length > 0) {
+                managerNominationEmail(
+                  {
+                    name: item.name,
+                    email: item.email,
+                    training: saveDoc,
+                    manager: item.name
+                  },
+                  (mailErr, mailInfo) => {
+                    if (mailErr) {
+                      return res.status(200).json({
+                        error: false,
+                        message:
+                          'An unexpected error occurred sending out the email but your training session has been booked successfully.',
+                        error_message: mailErr
+                      })
+                    } else {
+                      return res.status(200).json({
+                        error: false,
+                        message: 'Nominations successful.',
+                        data: saveDoc,
+                        addCount: count,
+                        repeatCount: req.body.nominations.length - count
+                      })
+                    }
                   }
-                }
-              )
+                )
+              } else {
+                return res.status(200).json({
+                  error: false,
+                  message: 'Nominations successful.',
+                  data: saveDoc,
+                  addCount: count,
+                  repeatCount: req.body.nominations.length - count
+                })
+              }
             } else {
               return res.status(200).json({
                 error: true,

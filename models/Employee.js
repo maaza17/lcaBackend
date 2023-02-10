@@ -6,6 +6,11 @@ employeeSchema = new mongoose.Schema({
         required: true,
         unique: true
     },
+    empemail: {
+        type: String,
+        required: false,
+        default: "demo@demo.com"
+    },
     empname: {
         type: String,
         required: true

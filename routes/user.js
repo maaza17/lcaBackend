@@ -147,7 +147,7 @@ router.post('/loginuser', (req, res) => {
                         } else {
 
                             employeeModel.findOne({ _id: user.isEmployee.employeeID }, (empErr, empDoc) => {
-                                if(empErr){
+                                if (empErr) {
                                     return res.status(200).json({
                                         error: true,
                                         message: 'An unexpected error occurred. Please Try again later'
@@ -163,7 +163,7 @@ router.post('/loginuser', (req, res) => {
                                         internalID: empDoc ? empDoc.empid : null,
                                         lineManagerID: empDoc ? empDoc.emplinemanagerid : null,
                                     }
-    
+
                                     jwt.sign(payload, process.env.ENCRYPTION_SECRET_USER, { expiresIn: 172800 }, (signErr, userToken) => {
                                         if (signErr) {
                                             console.log('user token sign error')
@@ -443,7 +443,8 @@ router.post('/addUser_Admin', (req, res) => {
                     empgrade: empgrade,
                     empdivision: empdivision,
                     emplinemanagerid: emplinemanagerid,
-                    emplinemanagername: emplinemanagername
+                    emplinemanagername: emplinemanagername,
+                    empemail: empemail
                 })
                 console.log(newEmp);
                 newEmp.save((empSaveErr, empSaveDoc) => {
@@ -458,7 +459,7 @@ router.post('/addUser_Admin', (req, res) => {
                                 })
                             } else {
                                 // let userPass = generateUserPassword()
-                                let userPass = "1234567890"
+                                let userPass = "ABC_" + empid;
                                 let newUser = new userModel({
                                     name: empname,
                                     email: empemail,
@@ -970,30 +971,30 @@ router.post('/getUnderlings', (req, res) => {
             })
         } else {
             console.log(item);
-            employeeModel.find({emplinemanagerid: item.internalID}, {_id: true}, (empErr, empArr) => {
-                if(empErr) {
+            employeeModel.find({ emplinemanagerid: item.internalID }, { _id: true }, (empErr, empArr) => {
+                if (empErr) {
                     return res.status(200).json({
                         error: true,
                         message: 'An unexpected error occurred. Please try again later. employee find err'
                     })
-                } else if(empArr.length<=0) {
+                } else if (empArr.length <= 0) {
                     return res.status(200).json({
                         error: false,
                         message: 'No underlings found.',
                         data: []
                     })
                 } else {
-                    let list = empArr.map(item => {return String(item._id)})
+                    let list = empArr.map(item => { return String(item._id) })
                     console.log(list)
-                    userModel.find({"isEmployee.employeeID": {$in: list}}, (usersErr, userArr) => {
+                    userModel.find({ "isEmployee.employeeID": { $in: list } }, (usersErr, userArr) => {
                         console.log(usersErr)
                         console.log(userArr)
-                        if(usersErr) {
+                        if (usersErr) {
                             return res.status(200).json({
                                 error: true,
                                 message: 'An unexpected error occurred. Please try again later.',
                             })
-                        } else if(userArr.length<=0) {
+                        } else if (userArr.length <= 0) {
                             return res.status(200).json({
                                 error: false,
                                 message: 'No underlings found.',
