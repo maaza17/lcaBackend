@@ -6,7 +6,6 @@ const updateModel = require('../models/Updates')
 const enrollmentModel = require('../models/Enrollement')
 const verifyAdminToken = require('../helpers/verifyAdminToken')
 const verifyUserToken = require('../helpers/verifyUserToken')
-const { test } = require('../helpers/aws-mailer')
 
 router.get('/getListedCourses', (req, res) => {
 
@@ -239,6 +238,7 @@ router.post('/addNewCourse', (req, res) => {
             let courseContent = req.body.course.courseContent
             let availability = req.body.course.availability
             let watchTime = req.body.course.watchTime
+            let hasCertificate = req.body.course.hasCertificate
 
             // compute course stats
             let countSections = 0
@@ -262,6 +262,7 @@ router.post('/addNewCourse', (req, res) => {
                 courseAbstract: courseAbstract,
                 courseContent: courseContent,
                 availability: availability,
+                hasCertificate: hasCertificate,
                 courseStats: { countSections: countSections, countLessons: countLessons, watchTime: watchTime }
             })
 
@@ -600,14 +601,5 @@ router.post('/editCourse', (req, res) => {
     })
 })
 
-router.post('/test', (req, res) => {
-    test({ email: "gogeto931@gmail.com" }, (mailErr, mailInfo) => {
-        return res.status(200).json({
-            error: false,
-            mailErr: mailErr,
-            mailInfo: mailInfo,
-        })
-    })
-})
 
 module.exports = router

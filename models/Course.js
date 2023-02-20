@@ -18,7 +18,7 @@ const courseSchema = new mongoose.Schema({
         required: true
     },
     prerequisites: {
-        type: [{_id: mongoose.Schema.ObjectId, courseName: String, courseInstructor: String}],
+        type: [{ _id: mongoose.Schema.ObjectId, courseName: String, courseInstructor: String }],
         required: true,
         default: []
     },
@@ -27,7 +27,7 @@ const courseSchema = new mongoose.Schema({
         required: true
     },
     courseContent: {
-        type:[{
+        type: [{
             sectionTitle: String,
             sectionAbstract: String,
             sectionLessons: [{
@@ -38,7 +38,7 @@ const courseSchema = new mongoose.Schema({
                 isQuiz: Boolean,
                 lessonQuiz: [{
                     question: String,
-                    answerOptions: [{option1: String, option2: String, option3: String, option4: String}],
+                    answerOptions: [{ option1: String, option2: String, option3: String, option4: String }],
                     correctAnswer: String
                 }]
             }]
@@ -63,7 +63,7 @@ const courseSchema = new mongoose.Schema({
         type: {
             forEmployees: Boolean,
             forExternals: Boolean,
-            employeeList: [{employeeID: mongoose.Schema.ObjectId}]
+            employeeList: [{ employeeID: mongoose.Schema.ObjectId }]
         },
         required: true,
         default: {
@@ -72,7 +72,7 @@ const courseSchema = new mongoose.Schema({
             employeeList: []
         }
     },
-    status:{
+    status: {
         type: String,
         enum: ['Listed', 'Hidden'],
         required: true,
@@ -82,6 +82,11 @@ const courseSchema = new mongoose.Schema({
         type: Date,
         required: true,
         default: Date.now()
+    },
+    hasCertificate: {
+        type: Boolean,
+        required: false,
+        default: false
     }
 })
 

@@ -46,7 +46,8 @@ router.post('/editTraining', (req, res) => {
           capacity: req.body.capacity,
           slotsLeft: req.body.slotsLeft,
           participants: req.body.participants,
-          eventType: req.body.eventType
+          eventType: req.body.eventType,
+          hasCertificate: req.body.hasCertificate
         },
         { new: true },
         (err, doc) => {
@@ -100,6 +101,7 @@ router.post('/addTraining', (req, res) => {
         capacity: req.body.capacity,
         slotsLeft: req.body.slotsLeft,
         participants: req.body.participants,
+        hasCertificate: req.body.hasCertificate,
         eventType: req.body.eventType.toLowerCase()
       })
       newTraining.save((err, newDoc) => {
