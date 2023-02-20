@@ -340,6 +340,48 @@ router.post('/getActiveTrainingsForUser', (req, res) => {
   })
 })
 
+// get Certificate availability in user dashboard
+router.post('/getTrainingCertificate', (req, res) => {
+  trainingModel.findOne(
+    { _id: req.body.trainingID },
+    (err, training) => {
+      if (training) {
+        if (training.endDate && (training.endDate < Date.now())) {
+          let temp = training.participants.filter(obj => obj.userID.equals(req.body.userID))
+          if (training.hasCertificate) {
+            if (temp.length > 0) {
+              return res.status(200).json({
+                error: false,
+                certificate: true
+              })
+            } else {
+              return res.status(200).json({
+                error: false,
+                certificate: "You were not a participant of this training. Certificates are only for participants",
+              })
+            }
+          } else {
+            return res.status(200).json({
+              error: false,
+              certificate: "The training does not have a certificate.",
+            })
+          }
+        } else {
+          return res.status(200).json({
+            error: false,
+            certificate: "The training has not ended yet. Certificates can only be issued when a training ends",
+          })
+        }
+      } else {
+        return res.status(200).json({
+          error: true,
+          message: 'Training not found. It might have been deleted/cancelled.'
+        })
+      }
+    }
+  )
+})
+
 // for listing in user dashboard
 router.post('/getNominatedTrainingsForUser', (req, res) => {
   if (!req.body.token) {

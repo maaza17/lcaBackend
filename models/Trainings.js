@@ -61,6 +61,11 @@ const trainingSchema = new mongoose.Schema({
         type: Boolean,
         required: false,
         default: false
+    },
+    hasCertificate: {
+        type: Boolean,
+        required: false,
+        default: false
     }
 })
 
