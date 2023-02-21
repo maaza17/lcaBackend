@@ -82,14 +82,6 @@ router.post('/getEmployeeDetails', (req, res) => {
     })
 })
 
-router.post('/haris', (req, res) => {
-    employeeModel.deleteMany({ empid: { $in: ["1234", "5678", "318", "319"] } }, (err, doc) => {
-        return res.status(200).json({
-            message: "done",
-            doc: doc
-        })
-    })
-})
 
 router.post('/bulkRewriteEmployees', (req, res) => {
     // console.log(req.body.token)

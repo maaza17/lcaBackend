@@ -166,7 +166,7 @@ router.post('/loginuser', (req, res) => {
 
                                     jwt.sign(payload, process.env.ENCRYPTION_SECRET_USER, { expiresIn: 172800 }, (signErr, userToken) => {
                                         if (signErr) {
-                                            console.log('user token sign error')
+                                            console.log('User token not found. Please login to continue')
                                             return res.status(200).json({
                                                 error: true,
                                                 message: 'An unexpected error occurred. Please try again later.'
@@ -670,7 +670,7 @@ router.post('/resetUserPasswordLoggedIn', (req, res) => {
     if (!req.body.token) {
         return res.status(200).json({
             error: true,
-            message: 'User token is required to proceed.'
+            message: 'User token not found. Please login to continue'
         })
     }
 
@@ -959,7 +959,7 @@ router.post('/getUnderlings', (req, res) => {
     if (!req.body.token) {
         return res.status(200).json({
             error: true,
-            message: 'User token required.'
+            message: 'User token not found. Please login to continue.'
         })
     }
 

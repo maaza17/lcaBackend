@@ -307,7 +307,7 @@ router.post('/checkEligibility', (req, res) => {
     if (!req.body.token) {
         return res.status(200).json({
             error: true,
-            message: 'User token is required to proceed.'
+            message: 'User token not found. Please login to continue'
         })
     }
 
@@ -451,7 +451,7 @@ router.post('/checkAvailability', (req, res) => {
     if (!req.body.token) {
         return res.status(200).json({
             error: true,
-            message: 'User token is required to proceed.'
+            message: 'User token not found. Please login to continue'
         })
     }
     verifyUserToken(req.body.token, (item) => {
@@ -510,7 +510,7 @@ router.post('/getEnrolledCourses', (req, res) => {
     if (!req.body.token) {
         return res.status(200).json({
             error: true,
-            message: 'User token is required to proceed.'
+            message: 'User token not found. Please login to continue'
         })
     }
 

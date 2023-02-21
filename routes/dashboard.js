@@ -106,7 +106,7 @@ router.post("/getMyCourses", (req, res) => {
                 .then((enrollmentDocs) => {
                     // console.log(enrollmentDocs)
                     if (enrollmentDocs && enrollmentDocs.length >= 5) {
-                        console.log(enrollmentDocs);
+                        // console.log(enrollmentDocs);
                         // console.log('here');
                         for (var i = 0; i < 5; i++) {
                             courseIDs.push(enrollmentDocs[i].courseId)
@@ -144,13 +144,23 @@ router.post("/getMyCourses", (req, res) => {
                             for (var i = 0; i < enrollmentDocs.length; i++) {
                                 let courseObj = courseDocs.find(obj => enrollmentDocs[i].courseId.equals(obj._id));
                                 if (courseObj) {
-                                    console.log(courseObj)
                                     let sum = 0;
-                                    for (var j = 0; j < enrollmentDocs[i].sectionIndex; j++) {
-                                        for (var k = 0; k < enrollmentDocs[i].lessonIndex; k++) {
-                                            sum = sum + 1;
+                                    try {
+                                        for (var k = 0; k <= enrollmentDocs[i].sectionIndex; k++) {
+                                            if (k === enrollmentDocs[i].sectionIndex) {
+                                                sum = sum + enrollmentDocs[i].lessonIndex
+                                            } else {
+                                                for (var l = 0; l < courseObj.courseContent[k].sectionLessons.length; l++) {
+                                                    sum = sum + 1;
+                                                }
+                                            }
                                         }
+                                    } catch {
+                                        sum = 0;
                                     }
+                                    // console.log(enrollmentDocs[i]);
+                                    // console.log(sum);
+                                    // console.log(courseObj.courseStats.countLessons);
                                     courses.push({
                                         percentage: (enrollmentDocs[i].score / enrollmentDocs[i].maxScore) * 100,
                                         courseData: courseObj,
@@ -168,6 +178,8 @@ router.post("/getMyCourses", (req, res) => {
                                         text: "From Recent Courses Uploaded"
                                     })
                                 }
+                                console.log("courses")
+                                console.log(courses[0])
                                 return res.status(200).json({
                                     error: false,
                                     data: courses

@@ -7,51 +7,12 @@ const courseModel = require('../models/Course')
 const userModel = require('../models/User')
 const bcrypt = require('bcryptjs')
 
-router.post('/haris', (req, res) => {
-  userModel.findOne({ _id: '633ec0357f2160b220c36acb' }, (err, doc) => {
-    bcrypt.genSalt(10, (saltErr, salt) => {
-      if (saltErr) {
-        return res.status(200).json({
-          error: true,
-          message: 'Unexpected error occurred. Please try again later.'
-        })
-      } else {
-        bcrypt.hash('abc123', salt, (hashErr, hash) => {
-          if (hashErr) {
-            return res.status(200).json({
-              error: true,
-              message: 'Unexpected error occurred. Please try again later.'
-            })
-          } else {
-            doc.password = hash
-            doc.save((saveErr, saveDoc) => {
-              if (saveErr) {
-                return res.status(200).json({
-                  error: true,
-                  message:
-                    'An Unexpected error occurred. Please try again later.'
-                })
-              } else {
-                // send password reset email here
-                return res.status(200).json({
-                  error: false,
-                  message: 'Password reset successfully.',
-                  data: saveDoc
-                })
-              }
-            })
-          }
-        })
-      }
-    })
-  })
-})
 
 router.post('/enrollCourse', (req, res) => {
   if (!req.body.token) {
     return res.status(200).json({
       error: true,
-      message: 'User token is required to proceed.'
+      message: 'User token not found. Please login to continue'
     })
   }
   verifyUserToken(req.body.token, item => {
@@ -192,7 +153,7 @@ router.post('/deEnrollCourse', (req, res) => {
   if (!req.body.token) {
     return res.status(200).json({
       error: true,
-      message: 'User token is required to proceed.'
+      message: 'User token not found. Please login to continue'
     })
   }
 
@@ -239,7 +200,7 @@ router.post('/updateProgress', (req, res) => {
   if (!req.body.token) {
     return res.status(200).json({
       error: true,
-      message: 'User token is required to proceed.'
+      message: 'User token not found. Please login to continue'
     })
   }
 
@@ -310,7 +271,7 @@ router.post('/score', (req, res) => {
   if (!req.body.token) {
     return res.status(200).json({
       error: true,
-      message: 'User token is required to proceed.'
+      message: 'User token not found. Please login to continue'
     })
   }
 
@@ -367,7 +328,7 @@ router.post('/getGrade', (req, res) => {
   if (!req.body.token) {
     return res.status(200).json({
       error: true,
-      message: 'User token is required to proceed.'
+      message: 'User token not found. Please login to continue'
     })
   }
 
@@ -414,7 +375,7 @@ router.post('/markAsCompleted', (req, res) => {
   if (!req.body.token) {
     return res.status(200).json({
       error: true,
-      message: 'User token is required to proceed.'
+      message: 'User token not found. Please login to continue'
     })
   }
 
@@ -471,7 +432,7 @@ router.post('/getSingleEnrolled', (req, res) => {
   if (!req.body.token) {
     return res.status(200).json({
       error: true,
-      message: 'User token is required.'
+      message: 'User token not found. Please login to continue'
     })
   } else {
     verifyUserToken(req.body.token, item => {
@@ -518,7 +479,7 @@ router.post('/getEnrollmentData', (req, res) => {
   if (!req.body.token) {
     return res.status(200).json({
       error: true,
-      message: 'User token is required.'
+      message: 'User token not found. Please login to continue'
     })
   } else {
     verifyUserToken(req.body.token, item => {

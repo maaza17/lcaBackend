@@ -103,7 +103,7 @@ function forgotPasswordAdminAlert({ name, email, confirmationCode }, callback) {
         from: '"LCA" <' + process.env.NODEMAILER_USER + '>',
         to: email,
         subject: 'MNP LCA Password Reset Link',
-        html: '<body><h3>Hello ' + name + '</h3><br /><p>You recently requested to reset your password.</p><br /><p><br />Please reset your password by visiting this <a href="lca.walzixdigitals.com/AdminPasswordVerify?code=' + confirmationCode + '">link.<a/><br /><br />If you have questions, we are here to help. Email us at random@mulphico.com</p><br /><br /><p>Regards,</p><p>Team LCA</p></body>'
+        html: '<body><h3>Hello ' + name + '</h3><br /><p>You recently requested to reset your password.</p><br /><p><br />Please reset your password by visiting this <a href="' + process.env.REACT_APP_FRONTEND_URL + '/AdminPasswordVerify?code=' + confirmationCode + '">link.<a/><br /><br />If you have questions, we are here to help. Email us at random@mulphico.com</p><br /><br /><p>Regards,</p><p>Team LCA</p></body>'
     }
 
     transport.sendMail(mailOptions, (mailErr, mailInfo) => {
@@ -116,7 +116,7 @@ function selfNominationEmail({ name, email, training }, callback) {
         from: '"LCA" <' + process.env.NODEMAILER_USER + '>',
         to: email,
         subject: 'MNP LCA Confirmation for Training Self Nomination',
-        html: '<body><h3>Hello ' + name + '</h3><br /><p>Your request for nomination to Training : ' + training.name + ' has been successfully completed.</p><br /><p>Following are the details for your training : </p><br /><p>Start : ' + getBeautifulDateTime(training.startDate) + '</p><br /><p>End : ' + getBeautifulDateTime(training.endDate) + '</p><br /><p>Location : ' + getBeautifulDateTime(training.location) + '</p><br /><p>Hoping for you to have fun and learn new things in this session!</p><br />If you have questions, we are here to help. Email us at random@mulphico.com</p><br /><br /><p>Regards,</p><p>Team LCA</p></body>'
+        html: '<body><h3>Hello ' + name + '</h3><br /><p>Your request for nomination to Training : ' + training.name + ' has been successfully completed.</p><br /><p>Following are the details for your training : </p><br /><p>Start : ' + getBeautifulDateTime(training.startDate) + '</p><br /><p>End : ' + getBeautifulDateTime(training.endDate) + '</p><br /><p>Location : ' + training.location + '</p><br /><p>Hoping for you to have fun and learn new things in this session!</p><br />If you have questions, we are here to help. Email us at random@mulphico.com</p><br /><br /><p>Regards,</p><p>Team LCA</p></body>'
     }
 
     transport.sendMail(mailOptions, (mailErr, mailInfo) => {
@@ -129,7 +129,7 @@ function managerNominationEmail({ name, email, training, manager }, callback) {
         from: '"LCA" <' + process.env.NODEMAILER_USER + '>',
         to: email,
         subject: 'MNP LCA Confirmation for Training Nomination by ' + manager,
-        html: '<body><h3>Hello ' + name + '</h3><br /><p>Your were nominated by your manager, ' + manager + ' to Training : ' + training.name + '.</p><br /><p>Following are the details for your training : </p><br /><p>Start : ' + getBeautifulDateTime(training.startDate) + '</p><br /><p>End : ' + getBeautifulDateTime(training.endDate) + '</p><br /><p>Location : ' + getBeautifulDateTime(training.location) + '</p><br /><p>Hoping for you to have fun and learn new things in this session!</p><br />If you have questions, we are here to help. Email us at random@mulphico.com</p><br /><br /><p>Regards,</p><p>Team LCA</p></body>'
+        html: '<body><h3>Hello ' + name + '</h3><br /><p>Your were nominated by your manager, ' + manager + ' to Training : ' + training.name + '.</p><br /><p>Following are the details for your training : </p><br /><p>Start : ' + getBeautifulDateTime(training.startDate) + '</p><br /><p>End : ' + getBeautifulDateTime(training.endDate) + '</p><br /><p>Location : ' + training.location + '</p><br /><p>Hoping for you to have fun and learn new things in this session!</p><br />If you have questions, we are here to help. Email us at random@mulphico.com</p><br /><br /><p>Regards,</p><p>Team LCA</p></body>'
     }
 
     transport.sendMail(mailOptions, (mailErr, mailInfo) => {
