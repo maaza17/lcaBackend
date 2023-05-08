@@ -549,7 +549,8 @@ router.post('/getEnrolledCourses', (req, res) => {
                             return res.status(200).json({
                                 error: false,
                                 message: 'Enrolled courses retrieved successfully.',
-                                data: documents
+                                data: documents,
+                                enrollments : docs
                             })
                         }
                     })
